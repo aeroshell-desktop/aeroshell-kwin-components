@@ -63,8 +63,6 @@ find_package(KWinX11 REQUIRED COMPONENTS
 )
 endif ()
 
-pkg_check_modules(smoddecoration REQUIRED IMPORTED_TARGET smoddecoration)
-
 feature_summary(WHAT ALL)
 
 set(kwin4_effect_smodsnap_SOURCES
@@ -86,28 +84,20 @@ endif ()
 add_library(${TARGET_NAME} SHARED ${kwin4_effect_smodsnap_SOURCES})
 add_library(${TARGET_NAME}-x11 SHARED ${kwin4_effect_smodsnap_SOURCES})
 
-target_link_directories(${TARGET_NAME}
-    PRIVATE
-        ${smoddecoration_LIBRARY_DIRS})
 
 target_link_libraries(${TARGET_NAME}
     PRIVATE
         Qt${QT_MAJOR_VERSION}::Core
         KF${QT_MAJOR_VERSION}::ConfigGui
         KDecoration3::KDecoration
-        PkgConfig::smoddecoration
         KWin::kwin
 )
-target_link_directories(${TARGET_NAME}-x11
-    PRIVATE
-        ${smoddecoration_LIBRARY_DIRS})
 
 target_link_libraries(${TARGET_NAME}-x11
     PRIVATE
         Qt${QT_MAJOR_VERSION}::Core
         KF${QT_MAJOR_VERSION}::ConfigGui
         KDecoration3::KDecoration
-        PkgConfig::smoddecoration
         KWinX11::kwin
 )
 
