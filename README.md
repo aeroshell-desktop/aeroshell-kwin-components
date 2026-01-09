@@ -12,10 +12,8 @@ These KWin components have been separated out from the main repository so that t
 
 ## Building
 
-The `smodglow` effect depends on [SMOD](https://gitgud.io/wackyideas/smod) being already built and installed on the system. To disable compiling `smodglow`, set `BUILD_SMODGLOW=OFF` in CMake (by default, it's enabled):
-
 ```bash
-cmake -B build -G Ninja -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SMODGLOW=OFF . # Use Ninja for faster builds 
+cmake -B build -G Ninja -DCMAKE_INSTALL_PREFIX=/usr . # Use Ninja for faster builds 
 cmake --build build
 sudo cmake --install build
 # Alternatively, for testing purposes
