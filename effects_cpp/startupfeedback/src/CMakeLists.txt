@@ -1,0 +1,33 @@
+#######################################
+# Effect
+
+# Source files
+set(startupfeedback_SOURCES
+    main.cpp
+    startupfeedback.cpp
+    startupfeedback.qrc
+)
+
+add_library(launchfeedback MODULE ${startupfeedback_SOURCES})
+add_library(launchfeedback-x11 MODULE ${startupfeedback_SOURCES})
+#kwin_add_builtin_effect(startupfeedback ${startupfeedback_SOURCES})
+
+target_link_libraries(launchfeedback PRIVATE
+    KF6::ConfigCore
+    KF6::ConfigGui
+    Qt::DBus
+    Qt::Widgets
+    KF6::WindowSystem
+    KWin::kwin
+)
+target_link_libraries(launchfeedback-x11 PRIVATE
+    KF6::ConfigCore
+    KF6::ConfigGui
+    Qt::DBus
+    Qt::Widgets
+    KF6::WindowSystem
+    KWinX11::kwin
+)
+install(TARGETS launchfeedback DESTINATION ${KDE_INSTALL_PLUGINDIR}/kwin/effects/plugins)
+set_target_properties(launchfeedback-x11 PROPERTIES OUTPUT_NAME x11/launchfeedback)
+install(TARGETS launchfeedback-x11 DESTINATION ${KDE_INSTALL_PLUGINDIR}/kwin-x11/effects/plugins)
