@@ -24,6 +24,8 @@ target_link_libraries(aeroglide-x11 PRIVATE
     KF6::ConfigGui
     KWinX11::kwin
 )
+set_target_properties(aeroglide-x11 PROPERTIES OUTPUT_NAME x11/aeroglide)
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/x11/)
 
 #######################################
 # Config
@@ -45,7 +47,6 @@ target_link_libraries(kwin_aeroglide_config
 )
 
 install(TARGETS aeroglide DESTINATION ${KDE_INSTALL_PLUGINDIR}/kwin/effects/plugins)
-set_target_properties(aeroglide-x11 PROPERTIES OUTPUT_NAME x11/aeroglide)
 install(TARGETS aeroglide-x11 DESTINATION ${KDE_INSTALL_PLUGINDIR}/kwin-x11/effects/plugins)
 install(TARGETS kwin_aeroglide_config DESTINATION ${KDE_INSTALL_PLUGINDIR}/kwin/effects/configs)
 install(TARGETS kwin_aeroglide_config DESTINATION ${KDE_INSTALL_PLUGINDIR}/kwin-x11/effects/configs)

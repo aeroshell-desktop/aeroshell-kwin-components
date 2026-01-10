@@ -84,6 +84,9 @@ endif ()
 add_library(${TARGET_NAME} SHARED ${kwin4_effect_smodsnap_SOURCES})
 add_library(${TARGET_NAME}-x11 SHARED ${kwin4_effect_smodsnap_SOURCES})
 
+set_target_properties(${TARGET_NAME}-x11 PROPERTIES OUTPUT_NAME x11/lib${TARGET_NAME})
+set_target_properties(${TARGET_NAME}-x11 PROPERTIES PREFIX "")
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/x11/)
 
 target_link_libraries(${TARGET_NAME}
     PRIVATE
@@ -115,7 +118,6 @@ install(
     DESTINATION
         ${KDE_INSTALL_PLUGINDIR}/kwin/effects/plugins
 )
-set_target_properties(${TARGET_NAME}-x11 PROPERTIES OUTPUT_NAME x11/lib${TARGET_NAME})
 install(
     TARGETS
         ${TARGET_NAME}-x11

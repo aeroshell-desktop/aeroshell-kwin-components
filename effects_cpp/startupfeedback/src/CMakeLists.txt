@@ -28,6 +28,8 @@ target_link_libraries(launchfeedback-x11 PRIVATE
     KF6::WindowSystem
     KWinX11::kwin
 )
-install(TARGETS launchfeedback DESTINATION ${KDE_INSTALL_PLUGINDIR}/kwin/effects/plugins)
 set_target_properties(launchfeedback-x11 PROPERTIES OUTPUT_NAME x11/launchfeedback)
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/x11/)
+
+install(TARGETS launchfeedback DESTINATION ${KDE_INSTALL_PLUGINDIR}/kwin/effects/plugins)
 install(TARGETS launchfeedback-x11 DESTINATION ${KDE_INSTALL_PLUGINDIR}/kwin-x11/effects/plugins)
