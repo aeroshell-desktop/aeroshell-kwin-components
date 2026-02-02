@@ -74,8 +74,8 @@ void GlideEffect::reconfigure(ReconfigureFlags flags)
 {
     Q_UNUSED(flags);
     GlideConfig::self()->read();
-    // On Windows 7 and 8/8.1, window animations are approximately 250ms in duration.
-    m_duration = std::chrono::milliseconds(animationTime<GlideConfig>(250ms));
+    // On Windows 7 and 8/8.1, window animations are approximately 220-250ms in duration.
+    m_duration = std::chrono::milliseconds(animationTime<GlideConfig>(220ms));
 
     m_inParams.accurateTilt = GlideConfig::accurateTilt();
     m_inParams.edge = static_cast<RotationEdge>(GlideConfig::inRotationEdge());
@@ -291,7 +291,23 @@ void GlideEffect::windowClosed(EffectWindow *w)
     animation.timeLine.reset();
     animation.timeLine.setDirection(TimeLine::Forward);
     animation.timeLine.setDuration(m_duration);
-    animation.timeLine.setEasingCurve(QEasingCurve::InQuad);
+
+    // Tries to mimic the curve uDWM.dll uses in Windows 8.1.
+    // Notice: Windows 7 uses a cubic ease out, but that can feel
+    // pretty heavy for an animation, especially on modern computers.
+    // On modern computers we notice hitches more because everything is
+    // much faster, so this curve gives the animation some initial
+    // velocity to work with, then has a heavy-ish drop.
+    // Note on how this works: In CSS, this curve is a
+    // cubic-bezier(0.13, 0.00, 0.73, 0.14).
+    // See this online cubic Bézier editor for the curve:
+    // https://www.curveeditor.com/#0.13,0.0,0.73,0.14
+    QEasingCurve uDWMCurve(QEasingCurve::BezierSpline);
+    uDWMCurve.addCubicBezierSegment(QPointF(0.13, 0.00),
+                                    QPointF(0.73, 0.14),
+                                    QPointF(1.0, 1.0));
+
+    animation.timeLine.setEasingCurve(uDWMCurve);
 
     redirect(w);
     effects->addRepaintFull();
