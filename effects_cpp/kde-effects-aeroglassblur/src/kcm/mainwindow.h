@@ -100,7 +100,7 @@ private:
         "8032cdcd-Sea-0",      "6614a600-Leaf-0",    "6697d937-Lime-0",
         "54fadc0e-Sun-0",      "80ff9c00-Pumpkin-0", "a8ce0f0f-Ruby-0",
         "66ff0099-Fuchsia-0",  "70fcc7f8-Blush-0 ",  "856e3ba1-Violet-0",
-        "528d5a94-Lavander-0", "6698844c-Taupe-0",   "a84f1b1b-Chocolate-0",
+        "528d5a94-Lavender-0", "6698844c-Taupe-0",   "a84f1b1b-Chocolate-0",
         "80555555-Slate-0",    "54fcfcfc-Frost-0",
         // Win Vista
         "45409efe-Default-1",
