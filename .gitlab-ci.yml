@@ -9,9 +9,12 @@ build-linux-x64:
     - pacman-key --init
     - pacman -Syu --needed --noconfirm ninja cmake gcc gcc-libs glibc frameworkintegration gcc-libs glibc kcmutils kcolorscheme kconfig kcoreaddons kdecoration kguiaddons ki18n kiconthemes kirigami kwidgetsaddons kwindowsystem qt6-base qt6-declarative qt6-svg extra-cmake-modules kwin kwin-x11 kdoctools krunner plasma-wayland-protocols wayland wayland-protocols python xorg-xwayland pkgconf
   script:
-    - cmake -G Ninja -DBUILD_TESTING=ON -B build . 
+    - cmake -G Ninja -DCMAKE_INSTALL_PREFIX=/usr -DKWIN_BUILD_WAYLAND=ON -DBUILD_TESTING=ON -B build .
     - cmake --build build 
     - DESTDIR=out cmake --install build
+    - cmake -G Ninja -DCMAKE_INSTALL_PREFIX=/usr -DKWIN_BUILD_WAYLAND=OFF -DKWIN_INSTALL_MISC=OFF -DBUILD_TESTING=ON -B build_x11 .
+    - cmake --build build_x11
+    - DESTDIR=out cmake --install build_x11
   artifacts:
     untracked: false
     when: on_success
