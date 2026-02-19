@@ -24,3 +24,12 @@ Options:
 
 - `KWIN_BUILD_WAYLAND` - Build effects for Wayland instead of X11. Off by default.
 - `KWIN_INSTALL_MISC` - Install other non-C++ components. On by default.
+
+### Note for Wayland Users
+You should define `KWIN_BUILD_WAYLAND` before building, otherwise you will get build errors.
+
+```bash
+cmake -B build -G Ninja -DCMAKE_INSTALL_PREFIX=/usr -DKWIN_BUILD_WAYLAND=ON .
+cmake --build build
+sudo cmake --install build
+```
