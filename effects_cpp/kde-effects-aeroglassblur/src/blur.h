@@ -23,6 +23,23 @@
 
 #include <unordered_map>
 
+// pswin was here
+#ifdef KWIN_BUILD_WAYLAND
+typedef KWin::Region EffectRegion;
+
+typedef KWin::Rect EffectRect;
+typedef KWin::RectF EffectRectF;
+
+typedef KWin::LogicalOutput EffectOutput;
+#else
+typedef QRegion EffectRegion;
+
+typedef QRect EffectRect;
+typedef QRectF EffectRectF;
+
+typedef KWin::Output EffectOutput;
+#endif
+
 namespace KWin
 {
 
@@ -39,13 +56,13 @@ struct BlurRenderData
 struct BlurEffectData
 {
     /// The region that should be blurred behind the window
-    std::optional<QRegion> content;
+    std::optional<EffectRegion> content;
 
     /// The region that should be blurred behind the frame
-    std::optional<QRegion> frame;
+    std::optional<EffectRegion> frame;
 
     /// The render data per screen. Screens can have different color spaces.
-    std::unordered_map<Output *, BlurRenderData> render;
+    std::unordered_map<EffectOutput *, BlurRenderData> render;
 };
 
 class BlurEffect : public KWin::Effect
@@ -61,12 +78,21 @@ public:
 
     void reconfigure(ReconfigureFlags flags) override;
     void prePaintScreen(ScreenPrePaintData &data, std::chrono::milliseconds presentTime) override;
+
+#ifdef KWIN_BUILD_WAYLAND
+    void prePaintWindow(RenderView *view, EffectWindow *w, WindowPrePaintData &data, std::chrono::milliseconds presentTime) override;
+#else
     void prePaintWindow(EffectWindow *w, WindowPrePaintData &data, std::chrono::milliseconds presentTime) override;
-    void drawWindow(const RenderTarget &renderTarget, const RenderViewport &viewport, EffectWindow *w, int mask, const QRegion &region, WindowPaintData &data) override;
+#endif
+
+    void drawWindow(const RenderTarget &renderTarget, const RenderViewport &viewport,
+                    EffectWindow *w, int mask, const EffectRegion &deviceRegion,
+                    WindowPaintData &data) override;
+
     QMatrix4x4 colorMatrix(const float &brightness, const float &saturation) const;
 
     //FF stuff
-    QRegion applyBlurRegion(KWin::EffectWindow *w, bool useFrame = false);
+    EffectRegion applyBlurRegion(KWin::EffectWindow *w, bool useFrame = false);
     bool isFirefoxWindowValid(KWin::EffectWindow *w);
 
     bool provides(Feature feature) override;
@@ -84,7 +110,7 @@ public:
 public Q_SLOTS:
     void slotWindowAdded(KWin::EffectWindow *w);
     void slotWindowDeleted(KWin::EffectWindow *w);
-    void slotScreenRemoved(KWin::Output *screen);
+    void slotScreenRemoved(EffectOutput *screen);
     void slotPropertyNotify(KWin::EffectWindow *w, long atom);
     void setupDecorationConnections(EffectWindow *w);
 
@@ -93,8 +119,10 @@ public Q_SLOTS:
 
 private:
     void initBlurStrengthValues();
-    QRegion blurRegion(EffectWindow *w, bool noRoundedCorners = false);
-    QRegion decorationBlurRegion(const EffectWindow *w) const;
+
+    EffectRegion blurRegion(EffectWindow *w, bool noRoundedCorners = false);
+    EffectRegion decorationBlurRegion(const EffectWindow *w) const;
+
     bool decorationSupportsBlurBehind(const EffectWindow *w) const;
     bool shouldBlur(const EffectWindow *w, int mask, const WindowPaintData &data) const;
     bool shouldForceBlur(const EffectWindow *w) const;
@@ -102,7 +130,10 @@ private:
     bool scaledOrTransformed(const EffectWindow *w, int mask, const WindowPaintData &data) const;
     bool shouldHaveCornerGlow(const EffectWindow *w) const;
     void updateBlurRegion(EffectWindow *w);
-    void blur(const RenderTarget &renderTarget, const RenderViewport &viewport, EffectWindow *w, int mask, const QRegion &region, WindowPaintData &data);
+
+    void blur(const RenderTarget &renderTarget, const RenderViewport &viewport,
+              EffectWindow *w, int mask, const EffectRegion &region,
+              WindowPaintData &data);
 
     void ensureReflectTexture();
     bool readMemory(bool* skipFunc);
@@ -176,9 +207,9 @@ private:
 
     bool m_valid = false;
     long net_wm_blur_region = 0;
-    QRegion m_paintedArea; // keeps track of all painted areas (from bottom to top)
-    QRegion m_currentBlur; // keeps track of the currently blured area of the windows(from bottom to top)
-    Output *m_currentScreen = nullptr;
+    EffectRegion m_paintedArea; // keeps track of all painted areas (from bottom to top)
+    EffectRegion m_currentBlur; // keeps track of the currently blured area of the windows(from bottom to top)
+    EffectOutput *m_currentScreen = nullptr;
 
     size_t m_iterationCount; // number of times the texture will be downsized to half size
     int m_offset;
@@ -253,7 +284,7 @@ private:
     QMap<EffectWindow *, QMetaObject::Connection> windowBlurChangedConnections;
     QMap<EffectWindow *, QMetaObject::Connection> windowExpandedGeometryChangedConnections;
     std::unordered_map<EffectWindow *, BlurEffectData> m_windows;
-    std::list<EffectWindow*> m_maximizedWindows;
+    std::list<EffectWindow *> m_maximizedWindows;
 
     static BlurManagerInterface *s_blurManager;
     static QTimer *s_blurManagerRemoveTimer;
