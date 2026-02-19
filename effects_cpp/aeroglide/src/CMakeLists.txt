@@ -10,22 +10,28 @@ kconfig_add_kcfg_files(aeroglide_SOURCES
     glideconfig.kcfgc
 )
 
-add_library(aeroglide MODULE ${aeroglide_SOURCES})
-add_library(aeroglide-x11 MODULE ${aeroglide_SOURCES})
+if (KWIN_BUILD_WAYLAND)
+    add_library(aeroglide MODULE ${aeroglide_SOURCES})
 
-#kwin_add_builtin_effect(glide ${glide_SOURCES})
-target_link_libraries(aeroglide PRIVATE
-    KF6::CoreAddons
-    KF6::ConfigGui
-    KWin::kwin
-)
-target_link_libraries(aeroglide-x11 PRIVATE
-    KF6::CoreAddons
-    KF6::ConfigGui
-    KWinX11::kwin
-)
-set_target_properties(aeroglide-x11 PROPERTIES OUTPUT_NAME x11/aeroglide)
-file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/x11/)
+    #kwin_add_builtin_effect(glide ${glide_SOURCES})
+    target_link_libraries(aeroglide PRIVATE
+        KF6::CoreAddons
+        KF6::ConfigGui
+        KWin::kwin
+    )
+else()
+    add_library(aeroglide-x11 MODULE ${aeroglide_SOURCES})
+    
+    #kwin_add_builtin_effect(glide ${glide_SOURCES})
+    target_link_libraries(aeroglide-x11 PRIVATE
+        KF6::CoreAddons
+        KF6::ConfigGui
+        KWinX11::kwin
+    )
+    
+    set_target_properties(aeroglide-x11 PROPERTIES OUTPUT_NAME x11/aeroglide)
+    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/x11/)
+endif()
 
 #######################################
 # Config
@@ -46,7 +52,10 @@ target_link_libraries(kwin_aeroglide_config
     #KWinEffectsInterface
 )
 
-install(TARGETS aeroglide DESTINATION ${KDE_INSTALL_PLUGINDIR}/kwin/effects/plugins)
-install(TARGETS aeroglide-x11 DESTINATION ${KDE_INSTALL_PLUGINDIR}/kwin-x11/effects/plugins)
-install(TARGETS kwin_aeroglide_config DESTINATION ${KDE_INSTALL_PLUGINDIR}/kwin/effects/configs)
-install(TARGETS kwin_aeroglide_config DESTINATION ${KDE_INSTALL_PLUGINDIR}/kwin-x11/effects/configs)
+if (KWIN_BUILD_WAYLAND)
+    install(TARGETS aeroglide DESTINATION ${KDE_INSTALL_PLUGINDIR}/kwin/effects/plugins)
+    install(TARGETS kwin_aeroglide_config DESTINATION ${KDE_INSTALL_PLUGINDIR}/kwin/effects/configs)
+else()
+    install(TARGETS aeroglide-x11 DESTINATION ${KDE_INSTALL_PLUGINDIR}/kwin-x11/effects/plugins)
+    install(TARGETS kwin_aeroglide_config DESTINATION ${KDE_INSTALL_PLUGINDIR}/kwin-x11/effects/configs)
+endif()
