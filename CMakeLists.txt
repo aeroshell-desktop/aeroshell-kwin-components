@@ -4,6 +4,7 @@ project(aerothemeplasma-kwin-components)
 set(PROJECT_VERSION "6.5.4")
 set(PROJECT_VERSION_MAJOR 6)
 option(KWIN_INSTALL_MISC "Install miscellaneous components" ON)
+option(KWIN_BUILD_WAYLAND "Build with Wayland support" OFF)
 
 add_subdirectory(effects_cpp)
 

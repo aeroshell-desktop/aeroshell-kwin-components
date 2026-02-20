@@ -1,4 +1,8 @@
-add_subdirectory(aeroglide)
-add_subdirectory(kde-effects-aeroglassblur)
-add_subdirectory(startupfeedback)
-add_subdirectory(kwin-effect-smodsnap-v2)
+
+if(KWIN_BUILD_WAYLAND)
+    add_subdirectory(wayland)
+else()
+    add_subdirectory(x11)
+endif()
+
+
