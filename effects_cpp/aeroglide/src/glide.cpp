@@ -96,7 +96,11 @@ void GlideEffect::reconfigure(ReconfigureFlags flags)
     m_outParams.opacity.to = GlideConfig::outOpacity();
 }
 
+#ifdef KWIN_BUILD_WAYLAND
+void GlideEffect::prePaintWindow(RenderView *view, EffectWindow *w, WindowPrePaintData &data, std::chrono::milliseconds presentTime)
+#else
 void GlideEffect::prePaintWindow(EffectWindow *w, WindowPrePaintData &data, std::chrono::milliseconds presentTime)
+#endif
 {
     auto animationIt = m_animations.find(w);
     if (animationIt != m_animations.end()) {
@@ -116,7 +120,11 @@ void GlideEffect::prePaintWindow(EffectWindow *w, WindowPrePaintData &data, std:
         animationIt->second.timeLine.advance(presentTime);
         data.setTransformed(); // Mark the window as transformed
     }
+#ifdef KWIN_BUILD_WAYLAND
+    effects->prePaintWindow(view, w, data, presentTime);
+#else
     effects->prePaintWindow(w, data, presentTime);
+#endif
 }
 
 QMatrix4x4 GlideEffect::calculateTransform(EffectWindow *window, const GlideParams &params, qreal t)
@@ -205,6 +213,27 @@ void GlideEffect::apply(EffectWindow *window, int mask, WindowPaintData &data, W
     data.multiplyOpacity(newOpacity);
 }
 
+#ifdef KWIN_BUILD_WAYLAND
+void GlideEffect::postPaintScreen()
+{
+    for (auto animationIt = m_animations.begin(); animationIt != m_animations.end();) {
+        EffectWindow *w = animationIt->first;
+        w->addRepaintFull();
+
+        if (animationIt->second.timeLine.done()) {
+            // Clear the data in case the last frame gets stuck in a transformed state, completing the animation
+            w->setData(TRANSFORMATION_DATA, QVariant());
+            w->setData(OPACITY_DATA, QVariant());
+            unredirect(animationIt->first);
+            animationIt = m_animations.erase(animationIt);
+        } else {
+            ++animationIt;
+        }
+    }
+
+    effects->postPaintScreen();
+}
+#else
 void GlideEffect::postPaintWindow(EffectWindow *w)
 {
     if (auto animationIt = m_animations.find(w); animationIt != m_animations.end()) {
@@ -223,6 +252,7 @@ void GlideEffect::postPaintWindow(EffectWindow *w)
 
     effects->postPaintWindow(w);
 }
+#endif
 
 bool GlideEffect::isActive() const
 {

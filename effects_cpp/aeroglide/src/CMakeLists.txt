@@ -12,6 +12,7 @@ kconfig_add_kcfg_files(aeroglide_SOURCES
 
 if (KWIN_BUILD_WAYLAND)
     add_library(aeroglide MODULE ${aeroglide_SOURCES})
+    target_compile_definitions(aeroglide PRIVATE "KWIN_BUILD_WAYLAND")
 
     #kwin_add_builtin_effect(glide ${glide_SOURCES})
     target_link_libraries(aeroglide PRIVATE

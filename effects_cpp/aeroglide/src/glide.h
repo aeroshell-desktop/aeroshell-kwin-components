@@ -48,8 +48,13 @@ public:
     ~GlideEffect() override;
 
     void reconfigure(ReconfigureFlags flags) override;
+#ifdef KWIN_BUILD_WAYLAND
+    void prePaintWindow(RenderView *view, EffectWindow *w, WindowPrePaintData &data, std::chrono::milliseconds presentTime) override;
+    void postPaintScreen() override;
+#else
     void prePaintWindow(EffectWindow *w, WindowPrePaintData &data, std::chrono::milliseconds presentTime) override;
     void postPaintWindow(EffectWindow *w) override;
+#endif
     bool isActive() const override;
     int requestedEffectChainPosition() const override;
 

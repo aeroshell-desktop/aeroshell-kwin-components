@@ -26,7 +26,16 @@
 
 #include <chrono>
 
+#ifdef KWIN_BUILD_WAYLAND
+typedef KWin::Region EffectRegion;
+typedef KWin::LogicalOutput EffectOutput;
+#else
+typedef QRegion EffectRegion;
+typedef KWin::Output EffectOutput;
+#endif
+
 class KSelectionOwner;
+
 namespace KWin
 {
 
@@ -42,7 +51,6 @@ public:
     void refresh();
 
 private:
-
     std::unique_ptr<ImageItem> m_imageItem;
     std::unique_ptr<ShapeCursorSource> m_source;
 };
@@ -58,7 +66,9 @@ public:
 
     void reconfigure(ReconfigureFlags flags) override;
     void prePaintScreen(ScreenPrePaintData &data, std::chrono::milliseconds presentTime) override;
-    void paintScreen(const RenderTarget &renderTarget, const RenderViewport &viewport, int mask, const QRegion &region, Output *screen) override;
+    void paintScreen(const RenderTarget &renderTarget, const RenderViewport &viewport,
+                     int mask, const EffectRegion &deviceRegion,
+                     EffectOutput *screen) override;
     void postPaintScreen() override;
     bool isActive() const override;
 

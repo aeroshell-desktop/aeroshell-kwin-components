@@ -10,6 +10,7 @@ set(startupfeedback_SOURCES
 
 if (KWIN_BUILD_WAYLAND)
     add_library(launchfeedback MODULE ${startupfeedback_SOURCES})
+    target_compile_definitions(launchfeedback PRIVATE "KWIN_BUILD_WAYLAND")
     
     target_link_libraries(launchfeedback PRIVATE
         KF6::ConfigCore
