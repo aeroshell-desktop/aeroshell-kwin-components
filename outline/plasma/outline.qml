@@ -77,7 +77,7 @@ Window
 
     visible: outline.active
 
-    title: "aerothemeplasma-windowframe-special"
+    title: "aeroshell-windowframe-special"
 
     property rect unifiedSize: {
         var w = 0;

@@ -14,6 +14,7 @@ var authenticationAgents = [
     "pinentry pinentry",
     "polkit-kde-authentication-agent-1 polkit-kde-authentication-agent-1",
     "polkit-kde-manager polkit-kde-manager",
+    "uac-polkit-agent polkit-kde-authentication-agent-1",
 
     // On Wayland, the resource name is filename of executable. It's empty for
     // authentication agents because KWayland can't get their executable paths.

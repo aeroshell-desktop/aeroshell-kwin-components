@@ -49,6 +49,7 @@ static const QSet<QString> s_blacklist{
     QStringLiteral("kdesudo kdesudo"),
     QStringLiteral("pinentry pinentry"),
     QStringLiteral("polkit-kde-authentication-agent-1 polkit-kde-authentication-agent-1"),
+    QStringLiteral("uac-polkit-agent polkit-kde-authentication-agent-1"),
     QStringLiteral("polkit-kde-manager polkit-kde-manager"),
 
     // On Wayland, the resource name is filename of executable. It's empty for

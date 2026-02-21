@@ -45,9 +45,9 @@
         "Description[zh_CN]": "将窗口缩略图按小型表格显示的窗口切换器布局",
         "Description[zh_TW]": "使用小縮圖格線的視窗切換器佈局",
         "Icon": "preferences-system-windows-switcher-thumbnail-grid",
-        "Id": "thumbnail_seven",
+        "Id": "thumbnail_aero",
         "License": "AGPLv3",
-        "Name": "Thumbnail Seven"
+        "Name": "Thumbnail Aero"
     },
     "X-Plasma-API": "declarativeappletscript"
 }

@@ -54,13 +54,13 @@
                 "Name": "catpswin56"
             }
         ],
-        "Category": "AeroThemePlasma",
-        "Description": "Effect that adds the animations for window previews in SevenTasks",
+        "Category": "AeroShell",
+        "Description": "Effect that adds the animations for window previews in task manager thumbnails",
         "EnabledByDefault": true,
         "Icon": "preferences-system-windows-effect-morphingpopups",
-        "Id": "seventasks-thumbnails",
+        "Id": "aeroshell-thumbnails",
         "License": "GPL",
-        "Name": "Animations for SevenTasks Thumbnails"
+        "Name": "Animations for Task Manager Thumbnails"
     },
     "X-KDE-Ordering": 60,
     "X-Plasma-API": "javascript"

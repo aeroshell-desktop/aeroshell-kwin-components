@@ -107,7 +107,7 @@ Item
 
             //opacity: peekOpacity
 
-            title: "aeropeek-aerothemeplasma"
+            title: "aeropeek-aeroshell"
             // Setup reflection
             Image
             {

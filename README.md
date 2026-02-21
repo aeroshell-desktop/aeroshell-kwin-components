@@ -1,6 +1,6 @@
-# KWin Components for AeroThemePlasma
+# AeroShell KWin Components 
 
-This repository contains AeroThemePlasma components related to KWin. It contains the following plugins:
+This repository contains AeroShell components related to KWin. It contains the following plugins:
 
 - JS Effects (dimscreen, fadingpopups, etc.)
 - C++ Effects (aeroglassblur, aeroglide, etc.)

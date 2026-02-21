@@ -56,6 +56,8 @@
 #define TRANSFORMATION_DATA 128
 #define OPACITY_DATA 129
 
+#define AS_MENUREP "aeroshell-menurepresentation"
+
 Q_LOGGING_CATEGORY(KWIN_BLUR, "kwin_effect_forceblur", QtWarningMsg)
 
 static void ensureResources()
@@ -1307,7 +1309,7 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
             else if (w->isDock()) {
                 if(maximizedWindowsShareScreen()) opaqueMaximize = true;
             }
-            else opaqueMaximize = maximizeState == MaximizeMode::MaximizeFull && windowClass != "kwin" && w->caption() != "sevenstart-menurepresentation";
+            else opaqueMaximize = maximizeState == MaximizeMode::MaximizeFull && windowClass != "kwin" && w->caption() != AS_MENUREP;
         }
         if(w->window()->resourceName() == "krunner" && w->window()->resourceClass() == "krunner" && m_opaqueKrunner) opaqueMaximize = true;
 
@@ -1456,15 +1458,15 @@ bool BlurEffect::shouldHaveCornerGlow(const EffectWindow *w) const
 {
 	QString windowClass = w->windowClass().split(' ')[1];
     if(w->isOnScreenDisplay() || w->isTooltip() || w->isSplash()) return false;
-    if(w->caption() == "sevenstart-menurepresentation" || (windowClass != "kwin" && w->isDock())) return false; // Disables panels and start menu
+    if(w->caption() == AS_MENUREP || (windowClass != "kwin" && w->isDock())) return false; // Disables panels and start menu
     return true;
 }
 
 bool BlurEffect::treatAsActive(const EffectWindow *w)
 {
 	QString windowClass = w->windowClass().split(' ')[1];
-    if (m_basicColorization && (w->isDock() || w->caption() == "sevenstart-menurepresentation")) return false;
-    if(w->caption() == "aerothemeplasma-tabbox" && !w->isManaged()) return true;
+    if (m_basicColorization && (w->isDock() || w->caption() == AS_MENUREP)) return false;
+    if(w->caption() == "aeroshell-tabbox" && !w->isManaged()) return true;
     if(effects->waylandDisplay() && !w->isWaylandClient() && w->window()->resourceName() == "") return true;
 	return (w->isOnScreenDisplay() || w->isFullScreen() || windowClass == "plasmashell" || windowClass == "kwin" || w == effects->activeWindow());
 }

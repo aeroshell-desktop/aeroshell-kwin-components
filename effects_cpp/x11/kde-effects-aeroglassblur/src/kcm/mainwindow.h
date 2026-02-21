@@ -235,7 +235,7 @@ private:
       "Windows 10 (Settings)",
       "Windows Vista Beta 2",
       "Windows 7 Build 6608",
-      "AeroThemePlasma"
+      "AeroShell"
     };
     QActionGroup *groupedActions;
 

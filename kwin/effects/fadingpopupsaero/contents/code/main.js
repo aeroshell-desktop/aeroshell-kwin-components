@@ -21,10 +21,10 @@ var blacklist = [
 ];
 
 var blacklistNames = [
-    "seventasks-floatingavatar",
-    "aerothemeplasma-windowframe-special",
-    "sevenstart-menurepresentation",
-    "aerothemeplasma-tabbox"
+    "aeroshell-floatingavatar",
+    "aeroshell-windowframe-special",
+    "aeroshell-menurepresentation",
+    "aeroshell-tabbox"
 ];
 
 function isDropdownMenu(window) {

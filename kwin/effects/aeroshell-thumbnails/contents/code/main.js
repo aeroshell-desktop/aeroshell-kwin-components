@@ -91,7 +91,7 @@ var morphingEffect = {
     },
 
     manage: function (window) {
-        if(window.caption === "seventasks-tooltip" || (window.splash && window.caption === "")) {
+        if(window.caption === "aeroshell-thumbnail" || (window.splash && window.caption === "")) {
             window.windowFrameGeometryAboutToChange.connect(morphingEffect.handleFrameGeometryAboutToChange);
             window.windowFrameGeometryChanged.connect(morphingEffect.handleFrameGeometryChanged);
         }

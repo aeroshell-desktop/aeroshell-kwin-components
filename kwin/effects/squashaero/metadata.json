@@ -46,7 +46,7 @@
                 "Name[zh_TW]": "Rivo Laks, Vlad Zahorodnii"
             }
         ],
-        "Category": "AeroThemePlasma",
+        "Category": "AeroShell",
         "Description": "Squash windows when they are minimized",
         "Description[ar]": "تنكمش النوافذ عند تصغيرها",
         "Description[be]": "Сціскаць вокны, калі яны згорнутыя",
@@ -90,7 +90,7 @@
         "Icon": "preferences-system-windows-effect-squash",
         "Id": "squashaero",
         "License": "GPL",
-        "Name": "Squash (AeroThemePlasma)"
+        "Name": "Squash Aero"
     },
     "X-KDE-Ordering": 60,
     "X-KWin-Exclusive-Category": "minimize",
