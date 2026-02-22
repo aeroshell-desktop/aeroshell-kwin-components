@@ -118,15 +118,10 @@ Item
                 y:            0
                 width:        unifiedSize.width
                 height:       unifiedSize.height
-                source:       StandardPaths.writableLocation(StandardPaths.GenericDataLocation) + path //"~/.local/share/smod/reflections.png"
+                source:       StandardPaths.locate(StandardPaths.GenericDataLocation, path)
                 sourceSize:   Qt.size(width, height)
                 smooth:       true
                 visible:      false
-                onStatusChanged: {
-                    if(status == 3) {
-                        reflection.source = "/usr/share" + path
-                    } // Error
-                }
             }
 
             // Setup mask
@@ -206,13 +201,8 @@ Item
                             property string path: "/smod/kwin/" + (peekwindow.clientActive ? "framecornereffect.png" : "framecornereffect-unfocus.png")
                             anchors.top: parent.top
                             anchors.left: parent.left
-                            source:       StandardPaths.writableLocation(StandardPaths.GenericDataLocation) + path
+                            source:       StandardPaths.locate(StandardPaths.GenericDataLocation, path)
                             smooth:       true
-                            onStatusChanged: {
-                                if(status == 3) {
-                                    source = "/usr/share" + path
-                                } // Error
-                            }
 
                         }
 
