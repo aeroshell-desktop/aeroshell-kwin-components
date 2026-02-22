@@ -29,7 +29,7 @@ public:
 
     void save() override;
 	void writeToMemory(int h, int s, int v, int i, bool transparency, bool skip);
-private slots:
+private Q_SLOTS:
 	void setTexturePath();
 	void clearTexturePath();
 	void openColorMixer(QString str);

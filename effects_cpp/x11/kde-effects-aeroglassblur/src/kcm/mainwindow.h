@@ -48,7 +48,7 @@ protected:
     void closeEvent(QCloseEvent *event) override;
     void showEvent(QShowEvent *event) override;
     bool eventFilter(QObject *o, QEvent *e) override;
-private slots:
+private Q_SLOTS:
     void on_colorGroupSpinBox_valueChanged(int value);
     void on_colorGroupLabel_clicked();
     void on_colorGroup_triggered(QAction *action);

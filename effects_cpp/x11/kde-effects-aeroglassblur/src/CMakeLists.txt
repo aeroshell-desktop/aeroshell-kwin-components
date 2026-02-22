@@ -30,6 +30,7 @@ else()
         KDecoration3::KDecoration
         KF6::Svg
         KWinX11::kwin
+        X11::xcb
     )
 
     set_target_properties(aeroglassblur-x11 PROPERTIES OUTPUT_NAME x11/aeroglassblur)

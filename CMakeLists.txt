@@ -15,6 +15,7 @@ include(ECMQtDeclareLoggingCategory)
 set(PROJECT_VERSION "6.5.4")
 set(PROJECT_VERSION_MAJOR 6)
 
+
 include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings NO_POLICY_SCOPE)
@@ -27,13 +28,14 @@ find_package(KF6 REQUIRED COMPONENTS
     Config
 )
 
+remove_definitions(-DQT_NO_CAST_FROM_ASCII)
 add_subdirectory(effects_cpp)
-add_subdirectory(rules)
 
 if(KWIN_INSTALL_MISC)
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/smod/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/smod)
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/kwin/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/kwin)
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/outline DESTINATION ${CMAKE_INSTALL_PREFIX}/share/aeroshell)
+    add_subdirectory(rules)
 else()
     message(STATUS "Skipping other KWin components")
 endif()

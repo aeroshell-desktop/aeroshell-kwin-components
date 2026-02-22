@@ -1,5 +1,3 @@
-remove_definitions(-DQT_NO_CAST_FROM_ASCII)
-
 add_executable(aeroshell_update_default_rules update_default_rules.cpp)
 target_link_libraries(aeroshell_update_default_rules
     KF6::ConfigCore
