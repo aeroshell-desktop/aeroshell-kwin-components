@@ -1,0 +1,17 @@
+[1]
+Description=POLKIT_RULES
+clientmachine=localhost
+minimizerule=2
+wmclass=(polkit-kde-authentication-agent-1)|(polkit-kde-manager)|(org.kde.polkit-kde-authentication-agent-1)
+wmclassmatch=3
+
+[2]
+Description=LINVER_RULES
+clientmachine=localhost
+minimizerule=2
+wmclass=linver
+wmclassmatch=1
+
+[General]
+count=2
+rules=1,2
