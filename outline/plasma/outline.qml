@@ -141,15 +141,10 @@ Window
 
         anchors.fill: parent
         property string path: "/smod/kwin/reflections.png"
-        source:       StandardPaths.writableLocation(StandardPaths.GenericDataLocation) + "/smod/kwin/reflections.png" //"~/.local/share/smod/reflections.png"
+        source:       StandardPaths.locate(StandardPaths.GenericDataLocation, path)
         sourceSize:   Qt.size(fullWidth, fullHeight)
         smooth:       true
         visible:      false
-        onStatusChanged: {
-            if(status == 3) {
-                reflection.source = "/usr/share" + path
-            } // Error
-        }
     }
 
     Rectangle
