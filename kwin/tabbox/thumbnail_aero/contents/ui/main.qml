@@ -11,12 +11,12 @@ import QtCore
 import QtQuick
 import QtQuick.Layouts
 import org.kde.plasma.core as PlasmaCore
-import org.kde.plasma.components 3.0 as PlasmaComponents3
-import org.kde.kwin 3.0 as KWin
-import org.kde.ksvg 1.0 as KSvg
-import org.kde.kirigami 2.20 as Kirigami
+import org.kde.plasma.components as PlasmaComponents3
+import org.kde.kwin as KWin
+import org.kde.ksvg as KSvg
+import org.kde.kirigami as Kirigami
 import org.kde.plasma.plasma5support as Plasma5Support
-import org.kde.kwindowsystem 1.0
+import org.kde.kwindowsystem
 import org.kde.plasma.workspace.dbus as DBus
 
 import Qt5Compat.GraphicalEffects
@@ -107,7 +107,7 @@ KWin.TabBoxSwitcher {
                     font.pixelSize: 16
                     color: "black"
                     horizontalAlignment: Text.AlignHCenter
-                    text: thumbnailGridView.currentItem ? (thumbnailGridView.currentItem.isShowDesktop ? "Desktop" : thumbnailGridView.currentItem.caption) : ""
+                    text: thumbnailGridView.currentItem ? (thumbnailGridView.currentItem.isShowDesktop ? i18nd("aeroshell-kwin-components", "Desktop") : thumbnailGridView.currentItem.caption) : ""
                     elide: Text.ElideRight
                     renderType: Text.NativeRendering
                     layer.enabled: true
