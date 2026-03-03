@@ -1,17 +1,17 @@
 // Qt
 import QtCore
-import QtQuick 2.15
-import QtQuick.Layouts 1.15
-import QtQuick.Window 2.15
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Window
 import Qt5Compat.GraphicalEffects
 
 // KDE
 
 import org.kde.kwin as KWin
-import org.kde.kwin.private.effects 1.0
-import org.kde.kwindowsystem 1.0
-import org.kde.plasma.core 2.0 as PlasmaCore
-import org.kde.plasma.extras 2.0 as PlasmaExtras
+import org.kde.kwin.private.effects
+import org.kde.kwindowsystem
+import org.kde.plasma.core as PlasmaCore
+import org.kde.plasma.extras as PlasmaExtras
 import org.kde.kirigami as Kirigami
 import org.kde.ksvg as KSvg
 
