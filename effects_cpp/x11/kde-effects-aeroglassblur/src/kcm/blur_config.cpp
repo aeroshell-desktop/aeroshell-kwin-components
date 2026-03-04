@@ -19,6 +19,7 @@
 #include <QJsonDocument>
 #include <QTimer>
 #include <QWindow>
+#include <klocalizedstring.h>
 
 namespace KWin
 {
@@ -28,6 +29,7 @@ K_PLUGIN_CLASS(BlurEffectConfig)
 BlurEffectConfig::BlurEffectConfig(QObject *parent, const KPluginMetaData &data)
     : KCModule(parent, data), m_sharedMemory("kwinaero")
 {
+    KLocalizedString::setApplicationDomain("aeroshell-kwin-components");
     ui.setupUi(widget());
     BlurConfig::instance("kwinrc");
     addConfig(BlurConfig::self(), widget());

@@ -11,6 +11,7 @@
 // KConfigSkeleton
 #include "glideconfig.h"
 
+#include <klocalizedstring.h>
 #include <KPluginFactory>
 #include "kwineffects_interface.h"
 #define KWIN_CONFIG "kwinrc"
@@ -23,6 +24,7 @@ K_PLUGIN_CLASS(GlideEffectConfig)
 GlideEffectConfig::GlideEffectConfig(QObject *parent, const KPluginMetaData &data)
     : KCModule(parent, data)
 {
+    KLocalizedString::setApplicationDomain("aeroshell-kwin-components");
     ui.setupUi(widget());
     GlideConfig::instance(KWIN_CONFIG);
     addConfig(GlideConfig::self(), widget());

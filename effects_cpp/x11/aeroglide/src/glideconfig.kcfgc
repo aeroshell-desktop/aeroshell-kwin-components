@@ -3,3 +3,5 @@ ClassName=GlideConfig
 NameSpace=KWin
 Singleton=true
 Mutators=true
+TranslationSystem=kde
+TranslationDomain=aeroshell-kwin-components
