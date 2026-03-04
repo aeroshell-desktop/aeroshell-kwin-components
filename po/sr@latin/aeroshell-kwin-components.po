@@ -22,7 +22,7 @@ msgstr ""
 #: mainwindow.cpp:122
 #, kde-format
 msgid "Change the color of your window borders, Start menu, and taskbar"
-msgstr "Promeni boju prozora, Start menija i traku zadataka"
+msgstr "Promeni boju prozora, Start menija i trake zadataka"
 
 #. i18n: file: effects_cpp/wayland/kde-effects-aeroglassblur/src/kcm/mainwindow.ui:218
 #. i18n: ectx: property (text), widget (QLabel, color_name_label)
