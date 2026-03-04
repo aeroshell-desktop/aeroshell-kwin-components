@@ -8,6 +8,7 @@
 #include <QWindow>
 #include <iostream>
 #include <QScrollBar>
+#include <klocalizedstring.h>
 
 #include "blur_config.h"
 
@@ -118,7 +119,7 @@ MainWindow::MainWindow(QSpinBox *spinbox, QSpinBox *spinboxg, QCheckBox *checkbo
   QColor border_color = QWidget::palette().midlight().color();
 
   // Using QToolBar to make the entire extended titlebar draggable
-  QLabel *titleLabel = new QLabel("<html><head/><body><p><span style=\" font-size:12pt;\">Change the color of your window borders, Start menu, and taskbar</span></p></body></html>");
+  QLabel *titleLabel = new QLabel("<html><head/><body><p><span style=\" font-size:12pt;\">" + i18n("Change the color of your window borders, Start menu, and taskbar") + "</span></p></body></html>");
   QGraphicsGlowEffect *glow_effect = new QGraphicsGlowEffect();
   glow_effect->setStrength(5);
   glow_effect->setBlurRadius(8);
@@ -343,8 +344,7 @@ void MainWindow::applyTemporarily() {
 
 // Changes the color between the custom and any of the predefined values.
 void MainWindow::changeColor(int index, bool apply) {
-  ui->color_name_label->setText("Current color: " +
-                                predefined_colors[index].getName());
+  ui->color_name_label->setText(i18n("Current color: %1", predefined_colors[index].getName()));
   selected_color = index;
   preventChanges = true;
   ui->hue_Slider->setValue(predefined_colors[index].getColor().hslHue());
@@ -373,7 +373,7 @@ void MainWindow::changeCustomColor(bool apply) {
     predefined_colors[selected_color].getFrameButton()->setSelected(false);
     selected_color = 0;
     predefined_colors[0].getFrameButton()->setSelected(true);
-    ui->color_name_label->setText("Current color: Custom");
+    ui->color_name_label->setText(i18n("Current color: %1", predefined_colors[0].getName()));
     QColor c;
     c.setHsv(ui->hue_Slider->value(), ui->saturation_Slider->value()*2.55f,
              ui->Lightness_Slider->value()*2.55f, ui->alpha_slider->value());
@@ -387,8 +387,8 @@ void MainWindow::changeCustomColor(bool apply) {
 void MainWindow::on_colorMixerLabel_linkActivated(const QString &link) {
   ui->colorMixerGroupBox->setVisible(!ui->colorMixerGroupBox->isVisible());
   ui->colorMixerLabel->setText(ui->colorMixerGroupBox->isVisible()
-                                   ? "<a style=\"color: #0066D4\" href=\"no\">Hide color mixer</a>"
-                                   : "<a style=\"color: #0066D4\" href=\"no\">Show color mixer</a>");
+                                   ? "<a style=\"color: #0066D4\" href=\"no\">" + i18n("Hide color mixer") + "</a>"
+                                   : "<a style=\"color: #0066D4\" href=\"no\">" + i18n("Show color mixer") + "</a>");
 }
 
 // Updates the color sliders and updates the custom color.

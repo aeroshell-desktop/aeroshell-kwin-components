@@ -11,11 +11,19 @@ mkdir -p $podir
 PKGNAME=aeroshell-kwin-components
 BUG_ADDR=https://gitgud.io/aeroshell/aeroshell-kwin-components/-/issues
 
+
+if [[ "$1" == "--update" ]]; then
+    for filename in $(find $podir -name "*.po"); do
+        msgmerge --update --backup=none --previous $filename $podir/$DOMAIN.pot
+    done
+    exit
+fi
+
 kde_xgettext() {
     xgettext --package-name=$PKGNAME \
         --msgid-bugs-address=$BUG_ADDR \
         --from-code=UTF-8 \
-        -C --kde \
+        --c++ --kde \
         -ci18n \
         -ki18n:1 -ki18nc:1c,2 -ki18np:1,2 -ki18ncp:1c,2,3 \
         -ki18nd:2 -ki18ndc:2c,3 -ki18ndp:2,3 -ki18ndcp:2c,3,4 \
@@ -38,5 +46,5 @@ export -f kde_xgettext
 export XGETTEXT="kde_xgettext"
 
 $EXTRACTRC `find -name \*.ui -o -name \*.rc -o -name \*.kcfg` >> rc.cpp || exit 11
-$XGETTEXT $(find -name *.cpp -o -name *.h  -o -name *.qml) -o $podir/$DOMAIN.pot
+$XGETTEXT $(find -name "*.cpp" -o -name "*.h"  -o -name "*.qml") -o $podir/$DOMAIN.pot
 rm -f rc.cpp

@@ -8,19 +8,23 @@
 #include <QWindow>
 #include <iostream>
 #include <QScrollBar>
+#include <QLineEdit>
+#include <klocalizedstring.h>
 
 #include "blur_config.h"
 
 
 // Clamps the value n into the interval [low, high].
-float constrain(float n, float low, float high) {
+float constrain(float n, float low, float high)
+{
   return std::max(std::min(n, high), low);
 }
 
 // Linearly maps a value from the expected interval [start1, stop1] to [start2,
 // stop2]. Implementation taken from p5.js
 float map(float value, float start1, float stop1, float start2, float stop2,
-          bool withinBounds = false) {
+          bool withinBounds = false)
+{
   float m = start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1));
   if (!withinBounds)
     return m;
@@ -31,7 +35,8 @@ float map(float value, float start1, float stop1, float start2, float stop2,
 }
 
 // Mixes the base color (light gray) with col at a certain percentage.
-QColor mixColor(QColor col, double percentage) {
+QColor mixColor(QColor col, double percentage)
+{
   QColor base = QColor(225, 225, 225);
   if (percentage > 1.0 || percentage < 0.0)
     return base;
@@ -118,7 +123,7 @@ MainWindow::MainWindow(QSpinBox *spinbox, QSpinBox *spinboxg, QCheckBox *checkbo
   QColor border_color = QWidget::palette().midlight().color();
 
   // Using QToolBar to make the entire extended titlebar draggable
-  QLabel *titleLabel = new QLabel("<html><head/><body><p><span style=\" font-size:12pt;\">Change the color of your window borders, Start menu, and taskbar</span></p></body></html>");
+  QLabel *titleLabel = new QLabel("<html><head/><body><p><span style=\" font-size:12pt;\">" + i18n("Change the color of your window borders, Start menu, and taskbar") + "</span></p></body></html>");
   QGraphicsGlowEffect *glow_effect = new QGraphicsGlowEffect();
   glow_effect->setStrength(5);
   glow_effect->setBlurRadius(8);
@@ -343,8 +348,8 @@ void MainWindow::applyTemporarily() {
 
 // Changes the color between the custom and any of the predefined values.
 void MainWindow::changeColor(int index, bool apply) {
-  ui->color_name_label->setText("Current color: " +
-                                predefined_colors[index].getName());
+  QString newStr = i18n("Current color: %1", predefined_colors[index].getName());
+  ui->color_name_label->setText(newStr);
   selected_color = index;
   preventChanges = true;
   ui->hue_Slider->setValue(predefined_colors[index].getColor().hslHue());
@@ -373,7 +378,8 @@ void MainWindow::changeCustomColor(bool apply) {
     predefined_colors[selected_color].getFrameButton()->setSelected(false);
     selected_color = 0;
     predefined_colors[0].getFrameButton()->setSelected(true);
-    ui->color_name_label->setText("Current color: Custom");
+    QString newStr = i18n("Current color: %1", predefined_colors[0].getName());
+    ui->color_name_label->setText(newStr);
     QColor c;
     c.setHsv(ui->hue_Slider->value(), ui->saturation_Slider->value()*2.55f,
              ui->Lightness_Slider->value()*2.55f, ui->alpha_slider->value());
@@ -387,8 +393,8 @@ void MainWindow::changeCustomColor(bool apply) {
 void MainWindow::on_colorMixerLabel_linkActivated(const QString &link) {
   ui->colorMixerGroupBox->setVisible(!ui->colorMixerGroupBox->isVisible());
   ui->colorMixerLabel->setText(ui->colorMixerGroupBox->isVisible()
-                                   ? "<a style=\"color: #0066D4\" href=\"no\">Hide color mixer</a>"
-                                   : "<a style=\"color: #0066D4\" href=\"no\">Show color mixer</a>");
+                                   ? "<a style=\"color: #0066D4\" href=\"no\">" + i18n("Hide color mixer") + "</a>"
+                                   : "<a style=\"color: #0066D4\" href=\"no\">" + i18n("Show color mixer") + "</a>");
 }
 
 // Updates the color sliders and updates the custom color.
@@ -438,7 +444,6 @@ void MainWindow::applyChanges() {
   kcfg_AeroSaturation->setValue(ui->saturation_Slider->value());
   kcfg_AeroBrightness->setValue(ui->Lightness_Slider->value());
   kcfg_AccentColorGroup->setValue(predefined_colors[selected_color].colorGroup());
-
   KWin::BlurEffectConfig *conf = (KWin::BlurEffectConfig *)config_parent;
   conf->save();
 }

@@ -215,7 +215,7 @@ QPushButton::down-arrow {
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>Current color: Custom</string>
+                 <string>Current color: %1</string>
                 </property>
                 <property name="margin">
                  <number>0</number>
