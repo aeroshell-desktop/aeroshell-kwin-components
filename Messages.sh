@@ -8,8 +8,8 @@ podir=./po
 EXTRACTRC=extractrc
 mkdir -p $podir
 
-PKGNAME=aeroshell-kwin-components
-BUG_ADDR=https://gitgud.io/aeroshell/aeroshell-kwin-components/-/issues
+PKGNAME=$DOMAIN
+BUG_ADDR=https://gitgud.io/aeroshell/$DOMAIN/-/issues
 
 
 if [[ "$1" == "--update" ]]; then
@@ -45,6 +45,8 @@ kde_xgettext() {
 export -f kde_xgettext
 export XGETTEXT="kde_xgettext"
 
+EXCLBLD="-not -path \"./build*\""
+
 $EXTRACTRC `find -name \*.ui -o -name \*.rc -o -name \*.kcfg` >> rc.cpp || exit 11
-$XGETTEXT $(find -name "*.cpp" -o -name "*.h"  -o -name "*.qml") -o $podir/$DOMAIN.pot
+$XGETTEXT $(find -not \( -path "./build*" -prune \)  -name "*.cpp" -o -name "*.h" -o -name "*.qml") -o $podir/$DOMAIN.pot
 rm -f rc.cpp
