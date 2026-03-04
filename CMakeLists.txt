@@ -27,11 +27,15 @@ find_package(KF6 REQUIRED COMPONENTS
 remove_definitions(-DQT_NO_CAST_FROM_ASCII)
 add_subdirectory(effects_cpp)
 
+find_package(KF6 REQUIRED COMPONENTS
+    I18n
+)
 if(KWIN_INSTALL_MISC)
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/smod/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/smod)
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/kwin/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/kwin)
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/outline DESTINATION ${CMAKE_INSTALL_PREFIX}/share/aeroshell)
     add_subdirectory(rules)
+    ki18n_install(po)
 else()
     message(STATUS "Skipping other KWin components")
 endif()
