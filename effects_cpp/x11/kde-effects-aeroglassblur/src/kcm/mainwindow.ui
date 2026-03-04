@@ -23,13 +23,13 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>aeroshell-personalize</string>
+   <string notr="true">aeroshell-personalize</string>
   </property>
   <property name="windowIcon">
    <iconset theme="preferences-desktop-theme-global"/>
   </property>
   <property name="whatsThis">
-   <string>Hi</string>
+   <string notr="true">Hi</string>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -174,7 +174,7 @@ QPushButton::down-arrow {
 }</string>
                    </property>
                    <property name="text">
-                    <string>Windows 7 ⏷</string>
+                    <string notr="true">Windows 7 ⏷</string>
                    </property>
                   </widget>
                  </item>
@@ -334,7 +334,7 @@ NOTE: This setting does NOT affect compositing settings.</string>
                     </size>
                    </property>
                    <property name="text">
-                    <string>TextLabel</string>
+                    <string notr="true">TextLabel</string>
                    </property>
                   </widget>
                  </item>
@@ -366,7 +366,7 @@ NOTE: This setting does NOT affect compositing settings.</string>
                  <cursorShape>PointingHandCursor</cursorShape>
                 </property>
                 <property name="text">
-                 <string>&lt;a href=&quot;no&quot; style=&quot;color: #0066D4&quot;&gt;Show color mixer&lt;/a&gt;</string>
+                 <string comment="Don't change the HTML markup, just the human-readable text">&lt;a href=&quot;no&quot; style=&quot;color: #0066D4&quot;&gt;Show color mixer&lt;/a&gt;</string>
                 </property>
                 <property name="textFormat">
                  <enum>Qt::TextFormat::RichText</enum>
@@ -517,7 +517,7 @@ NOTE: This setting does NOT affect compositing settings.</string>
                     </size>
                    </property>
                    <property name="text">
-                    <string>TextLabel</string>
+                    <string notr="true">TextLabel</string>
                    </property>
                   </widget>
                  </item>
@@ -536,7 +536,7 @@ NOTE: This setting does NOT affect compositing settings.</string>
                     </size>
                    </property>
                    <property name="text">
-                    <string>TextLabel</string>
+                    <string notr="true">TextLabel</string>
                    </property>
                   </widget>
                  </item>
@@ -555,7 +555,7 @@ NOTE: This setting does NOT affect compositing settings.</string>
                     </size>
                    </property>
                    <property name="text">
-                    <string>TextLabel</string>
+                    <string notr="true">TextLabel</string>
                    </property>
                   </widget>
                  </item>
@@ -805,7 +805,7 @@ NOTE: This setting does NOT affect compositing settings.</string>
   </widget>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
-    <string>toolBar</string>
+    <string notr="true">toolBar</string>
    </property>
    <property name="styleSheet">
     <string notr="true">QToolBar {
