@@ -24,7 +24,7 @@
      </property>
      <widget class="QWidget" name="blurWidget">
       <attribute name="title">
-       <string>Appearance</string>
+       <string comment="Appearance tab in the blur KCM">Appearance</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
@@ -55,7 +55,7 @@
          <item>
           <widget class="QLabel" name="labelConstantBlurLight">
            <property name="text">
-            <string>Light</string>
+            <string comment="Low blur strength">Light</string>
            </property>
           </widget>
          </item>
@@ -87,7 +87,7 @@
          <item>
           <widget class="QLabel" name="labelConstantBlurStrong">
            <property name="text">
-            <string>Strong</string>
+            <string comment="High blur strength">Strong</string>
            </property>
           </widget>
          </item>
@@ -200,7 +200,7 @@
          <item>
           <widget class="QPushButton" name="clear_pushButton">
            <property name="toolTip">
-            <string>Clear</string>
+            <string comment="Reset the reflection texture">Clear</string>
            </property>
            <property name="text">
             <string/>
@@ -275,7 +275,7 @@
           <bool>true</bool>
          </property>
          <property name="text">
-          <string>&lt;a href=&quot;no&quot;&gt;Change accent color&lt;/a&gt;</string>
+          <string comment="Don't change the HTML markup, just the human-readable text">&lt;a href=&quot;no&quot;&gt;Change accent color&lt;/a&gt;</string>
          </property>
         </widget>
        </item>
@@ -327,7 +327,7 @@
      </widget>
      <widget class="QWidget" name="forceBlurWidget">
       <attribute name="title">
-       <string>Overrides</string>
+       <string comment="Overrides tab in the blur KCM">Overrides</string>
       </attribute>
       <layout class="QVBoxLayout">
        <item>
@@ -399,7 +399,7 @@
        <item>
         <widget class="QCheckBox" name="kcfg_BlurDocks">
          <property name="text">
-          <string>Blur docks</string>
+          <string comment="Blur windows that have a 'dock' type">Blur docks</string>
          </property>
         </widget>
        </item>
@@ -413,7 +413,7 @@
        <item>
         <widget class="QCheckBox" name="kcfg_OpaqueOSD">
          <property name="text">
-          <string>Make on screen displays opaque</string>
+          <string comment="Toggle opaqueness for OSDs">Make on screen displays opaque</string>
          </property>
         </widget>
        </item>
@@ -466,7 +466,7 @@
              </sizepolicy>
             </property>
             <property name="suffix">
-             <string>px</string>
+             <string comment="Pixel unit suffix">px</string>
             </property>
             <property name="minimum">
              <number>96</number>
@@ -552,84 +552,84 @@
       <item row="9" column="0">
        <widget class="QLabel" name="label_9">
         <property name="text">
-         <string>Afterflow Balance:</string>
+         <string notr="true" >Afterflow Balance:</string>
         </property>
        </widget>
       </item>
       <item row="9" column="1">
        <widget class="QLabel" name="printAfterglowBalance">
         <property name="text">
-         <string>TextLabel</string>
+         <string notr="true">TextLabel</string>
         </property>
        </widget>
       </item>
       <item row="10" column="0">
        <widget class="QLabel" name="label_8">
         <property name="text">
-         <string>Blur Balance:</string>
+         <string notr="true">Blur Balance:</string>
         </property>
        </widget>
       </item>
       <item row="10" column="1">
        <widget class="QLabel" name="printBlurBalance">
         <property name="text">
-         <string>TextLabel</string>
+         <string notr="true">TextLabel</string>
         </property>
        </widget>
       </item>
       <item row="8" column="1">
        <widget class="QLabel" name="printColorBalance">
         <property name="text">
-         <string>TextLabel</string>
+         <string notr="true">TextLabel</string>
         </property>
        </widget>
       </item>
       <item row="7" column="1">
        <widget class="QLabel" name="printBlue">
         <property name="text">
-         <string>TextLabel</string>
+         <string notr="true">TextLabel</string>
         </property>
        </widget>
       </item>
       <item row="6" column="1">
        <widget class="QLabel" name="printGreen">
         <property name="text">
-         <string>TextLabel</string>
+         <string notr="true">TextLabel</string>
         </property>
        </widget>
       </item>
       <item row="5" column="1">
        <widget class="QLabel" name="printRed">
         <property name="text">
-         <string>TextLabel</string>
+         <string notr="true">TextLabel</string>
         </property>
        </widget>
       </item>
       <item row="4" column="1">
        <widget class="QLabel" name="printBrightness">
         <property name="text">
-         <string>TextLabel</string>
+         <string notr="true">TextLabel</string>
         </property>
        </widget>
       </item>
       <item row="3" column="1">
        <widget class="QLabel" name="printSaturation">
         <property name="text">
-         <string>TextLabel</string>
+         <string notr="true">TextLabel</string>
         </property>
        </widget>
       </item>
       <item row="2" column="1">
        <widget class="QLabel" name="printHue">
         <property name="text">
-         <string>TextLabel</string>
+         <string notr="true">TextLabel</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
        <widget class="QLabel" name="printIntensity">
         <property name="text">
-         <string>TextLabel</string>
+         <string notr="true">TextLabel</string>
         </property>
        </widget>
       </item>

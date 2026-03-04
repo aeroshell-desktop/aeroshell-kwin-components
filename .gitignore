@@ -1,5 +1,8 @@
 build
 build-wl
+build_wl
+build_x11
 output
 effects_cpp/minimize3d
 .cache
+*.kdev4
