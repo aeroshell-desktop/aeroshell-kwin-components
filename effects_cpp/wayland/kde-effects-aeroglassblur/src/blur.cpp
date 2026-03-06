@@ -181,12 +181,6 @@ BlurEffect::BlurEffect() : m_sharedMemory("kwinaero")
     connect(effects, &EffectsHandler::windowAdded, this, &BlurEffect::slotWindowAdded);
     connect(effects, &EffectsHandler::windowDeleted, this, &BlurEffect::slotWindowDeleted);
     connect(effects, &EffectsHandler::viewRemoved, this, &BlurEffect::slotViewRemoved);
-    /*connect(effects, &EffectsHandler::propertyNotify, this, &BlurEffect::slotPropertyNotify);
-    connect(effects, &EffectsHandler::xcbConnectionChanged, this, [this]() {
-        net_wm_blur_region = effects->announceSupportProperty(s_blurAtomName, this);
-    });*/
-
-
     // Fetch the blur regions for all windows
     const auto stackingOrder = effects->stackingOrder();
     for (EffectWindow *window : stackingOrder) {
@@ -204,8 +198,6 @@ BlurEffect::~BlurEffect()
     if (s_blurManager) {
         s_blurManagerRemoveTimer->start(1000);
     }
-
-	//if(m_reflectPass.reflectTexture) delete m_reflectPass.reflectTexture;
 }
 
 
@@ -705,6 +697,7 @@ void BlurEffect::prePaintScreen(ScreenPrePaintData &data, std::chrono::milliseco
     m_currentDeviceBlur = Region();
     m_currentView = data.view;
 
+
     // We can avoid checking for every window by evaluating the condition here
     auto maximizedWindowsOnCurrentActivity = [&]() -> bool {
         return std::find_if(m_maximizedWindows.begin(), m_maximizedWindows.end(),
@@ -850,10 +843,6 @@ void BlurEffect::ensureReflectTexture()
        m_texturePath = QStringLiteral(":/effects/aeroblur/reflection.png");
     }
 	QImage textureImage(m_texturePath);
-	if(effects->waylandDisplay())
-	{
-		textureImage.flip(Qt::Horizontal);
-	}
 
 	m_reflectPass.reflectTexture = GLTexture::upload(textureImage);
 	m_reflectPass.reflectTexture->setFilter(GL_LINEAR_MIPMAP_LINEAR);
@@ -1295,6 +1284,7 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
             projectionMatrix.translate(scaledBackgroundRect.x(), scaledBackgroundRect.y());
             const auto scale = viewport.scale();
 
+
             m_reflectPass.shader->setUniform(m_reflectPass.mvpMatrixLocation, projectionMatrix);
 			m_reflectPass.shader->setUniform(m_reflectPass.screenResolutionLocation, QVector2D(screenSize.width() * scale, screenSize.height() * scale));
 			m_reflectPass.shader->setUniform(m_reflectPass.windowPosLocation, QVector2D(scaledBackgroundRect.x(), scaledBackgroundRect.y()));
@@ -1303,14 +1293,21 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
 			m_reflectPass.shader->setUniform(m_reflectPass.translateTextureLocation, m_translateTexture ? float(1.0) : float(0.0));
             m_reflectPass.shader->setUniform(m_reflectPass.colorMatrixLocation, colorMat);
 
+            bool useWayland = effects->waylandDisplay() != nullptr; // Determine whether to flip the textures or not
+            auto renderTexture = renderTarget.texture();
+            if(renderTexture)
+            {
+                auto transformKind = renderTarget.texture()->contentTransform().kind();
+                useWayland = useWayland && (transformKind != OutputTransform::Kind::Normal);
+            }
+            m_reflectPass.shader->setUniform(m_reflectPass.useWaylandLocation, useWayland);
+
             // Glow part
             m_reflectPass.shader->setUniform(m_reflectPass.glowEnableLocation, enableGlow);
             if(enableGlow)
             {
-                const bool useWayland = effects->waylandDisplay() != nullptr;
                 m_reflectPass.shader->setUniform(m_reflectPass.glowEnableLocation, enableGlow);
             	m_reflectPass.shader->setUniform(m_reflectPass.textureSizeLocation, QVector2D(glowTex->width(), glowTex->height()));
-            	m_reflectPass.shader->setUniform(m_reflectPass.useWaylandLocation, useWayland);
                 m_reflectPass.shader->setUniform(m_reflectPass.glowOpacityLocation, float(opacity*0.8));
 
                 glUniform1i(m_reflectPass.glowTextureLocation, 1);

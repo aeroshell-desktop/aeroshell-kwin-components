@@ -42,7 +42,12 @@ void main(void)
     float x = (gl_FragCoord.x + dx) / screenResolution.x;
     float y = (gl_FragCoord.y) / screenResolution.y;
 
-    vec2 uv = vec2(x, -y);
+    vec2 uv;
+    if(useWayland) {
+        uv = vec2(x, y);
+    } else {
+        uv = vec2(x, -y);
+    }
 
     vec4 result = vec4(texture2D(texUnit, uv).rgba) * opacity;
 

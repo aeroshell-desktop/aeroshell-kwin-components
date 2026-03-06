@@ -51,7 +51,12 @@ void main(void)
     float x = (gl_FragCoord.x + dx) / screenResolution.x;
     float y = (gl_FragCoord.y) / screenResolution.y;
 
-    vec2 t_uv = vec2(x, -y);
+    vec2 t_uv;
+    if(useWayland) {
+        t_uv = vec2(x, y);
+    } else {
+        t_uv = vec2(x, -y);
+    }
 
     vec4 result = texture(texUnit, t_uv) * opacity;
     //result.a *= opacity;
