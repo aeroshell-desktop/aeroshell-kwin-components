@@ -11,7 +11,7 @@
 "use strict";
 
 var loginEffect = {
-    duration: animationTime(300),
+    duration: animationTime(600),
     isFadeToBlack: false,
     loadConfig: function () {
         loginEffect.isFadeToBlack = effect.readConfig("FadeToBlack", false);
@@ -20,7 +20,7 @@ var loginEffect = {
         return window.windowClass === "ksplashqml ksplashqml";
     },
     isLockScreen: function (window) {
-        return window.windowClass === "kscreenlocker_greet kscreenlocker_greet";
+        return window.windowClass === "kscreenlocker_greet kscreenlocker_greet" || window.lockScreen;
     },
     fadeOut: function (window) {
         animate({
@@ -54,14 +54,11 @@ var loginEffect = {
         });
     },
     closed: function (window) {
-        if (!(loginEffect.isLoginSplash(window) || loginEffect.isLockScreen(window))) {
+        if(!(loginEffect.isLoginSplash(window) || loginEffect.isLockScreen(window))) {
             return;
         }
-        if (loginEffect.isFadeToBlack === true && !loginEffect.isLockScreen(window)) {
-            loginEffect.fadeToBlack(window);
-        } else {
-            loginEffect.fadeOut(window);
-        }
+
+        loginEffect.fadeOut(window);
     },
     init: function () {
         effect.configChanged.connect(loginEffect.loadConfig);
