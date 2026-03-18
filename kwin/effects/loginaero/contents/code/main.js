@@ -17,7 +17,7 @@ var loginEffect = {
         loginEffect.isFadeToBlack = effect.readConfig("FadeToBlack", false);
     },
     isLoginSplash: function (window) {
-        return window.windowClass === "ksplashqml ksplashqml";
+        return window.windowClass === "ksplashqml ksplashqml" || window.windowClass === "aeroshell-splash aeroshell-splash";
     },
     isLockScreen: function (window) {
         return window.windowClass === "kscreenlocker_greet kscreenlocker_greet" || window.lockScreen;

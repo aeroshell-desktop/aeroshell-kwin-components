@@ -39,6 +39,7 @@ static const QSet<QString> s_blacklist{
     QStringLiteral("ksmserver ksmserver"),
     QStringLiteral("ksmserver-logout-greeter ksmserver-logout-greeter"),
     QStringLiteral("ksplashqml ksplashqml"),
+    QStringLiteral("aeroshell-splash aeroshell-splash"),
     QStringLiteral("polkit-kde-authentication-agent-1 polkit-kde-authentication-agent-1"),
     // Spectacle needs to be blacklisted in order to stay out of its own screenshots.
     QStringLiteral("spectacle spectacle"), // x11

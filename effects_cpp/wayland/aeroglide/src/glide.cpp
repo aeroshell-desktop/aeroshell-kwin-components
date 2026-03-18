@@ -39,6 +39,7 @@ static const QSet<QString> s_blacklist{
     QStringLiteral("ksmserver ksmserver"),
     QStringLiteral("ksmserver-logout-greeter ksmserver-logout-greeter"),
     QStringLiteral("ksplashqml ksplashqml"),
+    QStringLiteral("aeroshell-splash aeroshell-splash"),
     QStringLiteral("polkit-kde-authentication-agent-1 polkit-kde-authentication-agent-1"),
     // Spectacle needs to be blacklisted in order to stay out of its own screenshots.
     QStringLiteral("spectacle spectacle"), // x11
@@ -55,7 +56,7 @@ static const QSet<QString> s_blacklist{
     // On Wayland, the resource name is filename of executable. It's empty for
     // authentication agents because KWayland can't get their executable paths.
     QStringLiteral(" org.kde.kdesu"),
-    QStringLiteral(" org.kde.polkit-kde-authentication-agent-1")
+    QStringLiteral(" org.kde.polkit-kde-authentication-agent-1"),
 
 };
 
