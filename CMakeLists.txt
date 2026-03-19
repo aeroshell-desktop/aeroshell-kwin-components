@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(aeroshell-kwin-components)
 
-set(PROJECT_VERSION "6.6.2")
+set(PROJECT_VERSION "6.6.3")
 set(PROJECT_VERSION_MAJOR 6)
 option(KWIN_INSTALL_MISC "Install miscellaneous components" ON)
 option(KWIN_BUILD_WAYLAND "Build with Wayland support" OFF)
