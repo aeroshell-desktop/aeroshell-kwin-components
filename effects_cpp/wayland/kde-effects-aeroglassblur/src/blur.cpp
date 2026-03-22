@@ -1184,31 +1184,9 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
         AeroPasses selectedPass = AeroPasses::AERO;
 
         // A window is maximized, use opaque colorization
-        auto maximizeState = w->window()->maximizeMode();
+        bool opaqueMaximize = shouldOpaqueColorize(w);
         bool basicCol = m_basicColorization;
         bool useTransparency = m_transparencyEnabled;
-
-        auto maximizedWindowsShareScreen = [&]() -> bool {
-            return std::find_if(m_maximizedWindows.begin(), m_maximizedWindows.end(),
-                                [&](const EffectWindow *a) { return a->screen() == w->screen(); }) != m_maximizedWindows.end();
-        };
-        QString windowClass = w->windowClass().split(' ')[1];
-        bool opaqueMaximize = false;
-        if(m_maximizeColorization) {
-            if(maximizeState != MaximizeMode::MaximizeFull && !w->isDock()) opaqueMaximize = false;
-            else if(!m_maximizedWindowsInCurrentActivity) opaqueMaximize = false;
-            else if (w->isDock()) {
-                if(maximizedWindowsShareScreen()) opaqueMaximize = true;
-            }
-            else opaqueMaximize = maximizeState == MaximizeMode::MaximizeFull && windowClass != "kwin" && w->caption() != AS_MENUREP;
-        }
-        if(w->window()->resourceName() == "krunner" && w->window()->resourceClass() == "krunner" && m_opaqueKrunner) opaqueMaximize = true;
-
-        if(w->isOnScreenDisplay() && m_opaqueOSD) opaqueMaximize = true;
-        // X11 Alt+Tab window
-        if(w->caption() == "" && windowClass == "kwin") opaqueMaximize = false;
-        // Wayland Alt+Tab window
-        if(effects->waylandDisplay() && !w->isWaylandClient() && w->window()->resourceName() == "") opaqueMaximize = false;
 
         if(opaqueMaximize)
         {
@@ -1353,6 +1331,40 @@ QMatrix4x4 BlurEffect::colorMatrix(const float &brightness, const float &saturat
 
     return saturationMatrix * brightnessMatrix;
 }
+
+bool BlurEffect::shouldOpaqueColorize(const EffectWindow *w) const
+{
+    auto maximizeState = w->window()->maximizeMode();
+    auto maximizedWindowsShareScreen = [&]() -> bool {
+        return std::find_if(m_maximizedWindows.begin(), m_maximizedWindows.end(),
+                            [&](const EffectWindow *a) { return a->screen() == w->screen(); }) != m_maximizedWindows.end();
+    };
+
+    QString windowClass = w->windowClass().split(' ')[1];
+
+    bool opaqueMaximize = false;
+
+    if(m_maximizeColorization) {
+        opaqueMaximize = maximizeState == MaximizeMode::MaximizeFull && windowClass != "kwin";
+
+        if(!m_maximizedWindowsInCurrentActivity) opaqueMaximize = false;
+        // dock or special plasmashell windows present in the same screen as a maximized window
+        // panels, vtp sidebar window, etc
+        else if(w->isDock() || w->window()->resourceClass() == "plasmashell") opaqueMaximize = maximizedWindowsShareScreen();
+        // tabbox
+        else if(effects->waylandDisplay() && !w->isWaylandClient() && w->window()->resourceName() == "") opaqueMaximize = false;
+
+        // regular plasmashell windows
+        // vistastart, tray dialogs, etc
+        if(w->window()->resourceClass() == "org.kde.plasmashell") opaqueMaximize = false;
+    }
+
+    if(w->window()->resourceName() == "krunner" && w->window()->resourceClass() == "krunner" && m_opaqueKrunner) opaqueMaximize = true;
+    if(w->isOnScreenDisplay() && m_opaqueOSD) opaqueMaximize = true;
+
+    return opaqueMaximize;
+}
+
 bool BlurEffect::shouldHaveCornerGlow(const EffectWindow *w) const
 {
 	QString windowClass = w->windowClass().split(' ')[1];

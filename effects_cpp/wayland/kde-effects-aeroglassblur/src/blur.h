@@ -99,6 +99,7 @@ private:
     bool shouldBlur(const EffectWindow *w, int mask, const WindowPaintData &data) const;
     bool shouldForceBlur(const EffectWindow *w) const;
     bool shouldNotBlur(const EffectWindow *w) const;
+    bool shouldOpaqueColorize(const EffectWindow *w) const;
     bool scaledOrTransformed(const EffectWindow *w, int mask, const WindowPaintData &data) const;
     bool shouldHaveCornerGlow(const EffectWindow *w) const;
     void updateBlurRegion(EffectWindow *w);
