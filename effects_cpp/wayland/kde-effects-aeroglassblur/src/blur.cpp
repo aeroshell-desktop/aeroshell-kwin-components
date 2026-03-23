@@ -1348,9 +1348,9 @@ bool BlurEffect::shouldOpaqueColorize(const EffectWindow *w) const
         opaqueMaximize = maximizeState == MaximizeMode::MaximizeFull && windowClass != "kwin";
 
         if(!m_maximizedWindowsInCurrentActivity) opaqueMaximize = false;
-        // dock or special plasmashell windows present in the same screen as a maximized window
+        // docks present in the same screen as a maximized window
         // panels, vtp sidebar window, etc
-        else if(w->isDock() || w->window()->resourceClass() == "plasmashell") opaqueMaximize = maximizedWindowsShareScreen();
+        else if(w->isDock()) opaqueMaximize = maximizedWindowsShareScreen();
         // tabbox
         else if(effects->waylandDisplay() && !w->isWaylandClient() && w->window()->resourceName() == "") opaqueMaximize = false;
 
