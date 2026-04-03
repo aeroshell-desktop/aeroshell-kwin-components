@@ -1,27 +1,30 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# aeroshell-kwin-components Polish translation.
+# Copyright (C) 2026 Inkatail
 # This file is distributed under the same license as the aeroshell-kwin-components package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
+# SPDX-FileCopyrightText: 2026 Inkatail <mrinkatail@gmail.com>
+# SPDX-FileCopyrightText: 2026 Marcel Mrówka <micro.mail88@gmail.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: aeroshell-kwin-components\n"
-"Report-Msgid-Bugs-To: https://gitgud.io/aeroshell/aeroshell-kwin-"
-"components/-/issues\n"
+"Report-Msgid-Bugs-To: https://gitgud.io/aeroshell/aeroshell-kwin-components/-/"
+"issues\n"
 "POT-Creation-Date: 2026-03-04 18:05+0100\n"
-"PO-Revision-Date: 2026-03-04 13:20+0200\n"
-"Last-Translator: Inkatail <mrinkatail@gmail.com>\n"
+"PO-Revision-Date: 2026-04-03 14:34+0200\n"
+"Last-Translator: Marcel Mrówka <micro.mail88@gmail.com>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language-Team: Polish <>\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 |"
+"| n%100>=20) ? 1 : 2);\n"
+"X-Generator: Lokalize 25.12.2\n"
 
 #: effects_cpp/wayland/kde-effects-aeroglassblur/src/kcm/mainwindow.cpp:122
 #: effects_cpp/x11/kde-effects-aeroglassblur/src/kcm/mainwindow.cpp:126
 #, kde-format
 msgid "Change the color of your window borders, Start menu, and taskbar"
-msgstr "Zmień kolor ramek okien, menu Start, lub paska zadań"
+msgstr "Zmień kolor ramek okien, menu Start oraz paska zadań"
 
 #. i18n: file: effects_cpp/wayland/kde-effects-aeroglassblur/src/kcm/mainwindow.ui:218
 #. i18n: ectx: property (text), widget (QLabel, color_name_label)
@@ -60,7 +63,8 @@ msgstr "Pulpit"
 #: rc.cpp:3 rc.cpp:225
 #, kde-format
 msgid "Enables a more accurate tilt effect at a very minor performance cost."
-msgstr "Pokaż wierniejszy efekt nachylenia kosztem bardzo małego spadku wydajności"
+msgstr ""
+"Włącza precyzyjniejszy efekt nachylenia kosztem drobnego spadku wydajności"
 
 #. i18n: file: effects_cpp/wayland/aeroglide/src/glide_config.ui:19
 #. i18n: ectx: property (text), widget (QLabel, label_Duration)
@@ -96,7 +100,7 @@ msgstr " milisekundy"
 #: rc.cpp:15 rc.cpp:237
 #, kde-format
 msgid "Enable a more accurate tilt effect."
-msgstr "Włącz wierniejszy efekt nachylenia"
+msgstr "Włącz precyzyjniejszy efekt nachylenia"
 
 #. i18n: file: effects_cpp/wayland/aeroglide/src/glide_config.ui:60
 #. i18n: ectx: property (title), widget (QGroupBox, groupBox_InAnimation)
@@ -105,7 +109,7 @@ msgstr "Włącz wierniejszy efekt nachylenia"
 #: rc.cpp:18 rc.cpp:240
 #, kde-format
 msgid "Window Open Animation"
-msgstr "Animacja otwierania okna"
+msgstr "Animacja otwierania okien"
 
 #. i18n: file: effects_cpp/wayland/aeroglide/src/glide_config.ui:66
 #. i18n: ectx: property (text), widget (QLabel, label_InRotationEdge)
@@ -205,7 +209,7 @@ msgstr "Dystans:"
 #: rc.cpp:42 rc.cpp:264
 #, kde-format
 msgid "Window Close Animation"
-msgstr "Animacja zamykania okna"
+msgstr "Animacja zamykania okien"
 
 #. i18n: file: effects_cpp/wayland/kde-effects-aeroglassblur/src/kcm/blur_config.ui:27
 #. i18n: ectx: attribute (title), widget (QWidget, blurWidget)
@@ -364,7 +368,7 @@ msgstr "Zastąpienia"
 #: rc.cpp:115 rc.cpp:337
 #, kde-format
 msgid "Classes of windows to force blur:"
-msgstr "Klasy okien w których wymusić rozmycie:"
+msgstr "Klasy okien, w których wymusić rozmycie:"
 
 #. i18n: file: effects_cpp/wayland/kde-effects-aeroglassblur/src/kcm/blur_config.ui:346
 #. i18n: ectx: property (text), widget (QLabel, label_3)
@@ -373,7 +377,7 @@ msgstr "Klasy okien w których wymusić rozmycie:"
 #: rc.cpp:118 rc.cpp:340
 #, kde-format
 msgid "Classes of Firefox windows to apply custom blur:"
-msgstr "Klasy okien Firefoxa na które nałożyć niestandardowe rozmycie"
+msgstr "Klasy okien Firefoxa, na które nałożyć niestandardowe rozmycie:"
 
 #. i18n: file: effects_cpp/wayland/kde-effects-aeroglassblur/src/kcm/blur_config.ui:353
 #. i18n: ectx: property (text), widget (QLabel, label_noblur)
@@ -382,7 +386,7 @@ msgstr "Klasy okien Firefoxa na które nałożyć niestandardowe rozmycie"
 #: rc.cpp:121 rc.cpp:343
 #, kde-format
 msgid "Classes of windows to not apply blur (regex):"
-msgstr "Klasy okien na które nie nakładać rozmycia (regex)"
+msgstr "Klasy okien, na które nie nakładać rozmycia (regex):"
 
 #. i18n: file: effects_cpp/wayland/kde-effects-aeroglassblur/src/kcm/blur_config.ui:360
 #. i18n: ectx: property (toolTip), widget (QPlainTextEdit, kcfg_WindowClasses)
@@ -399,7 +403,7 @@ msgstr "Klasy okien na które nie nakładać rozmycia (regex)"
 #: rc.cpp:124 rc.cpp:127 rc.cpp:130 rc.cpp:346 rc.cpp:349 rc.cpp:352
 #, kde-format
 msgid "One window class per line."
-msgstr "Jedna klasa okna na linie."
+msgstr "Jedna klasa okna na linię."
 
 #. i18n: file: effects_cpp/wayland/kde-effects-aeroglassblur/src/kcm/blur_config.ui:386
 #. i18n: ectx: property (text), widget (QRadioButton, kcfg_BlurMatching)
@@ -408,7 +412,7 @@ msgstr "Jedna klasa okna na linie."
 #: rc.cpp:133 rc.cpp:355
 #, kde-format
 msgid "Apply force blur list"
-msgstr "Zastosuj liste wymuszonego rozmycia"
+msgstr "Zastosuj listę wymuszonego rozmycia"
 
 #. i18n: file: effects_cpp/wayland/kde-effects-aeroglassblur/src/kcm/blur_config.ui:395
 #. i18n: ectx: property (text), widget (QCheckBox, kcfg_BlurMenus)
@@ -427,7 +431,7 @@ msgstr "Rozmyj menu"
 #, kde-format
 msgctxt "Blur windows that have a 'dock' type"
 msgid "Blur docks"
-msgstr "Rozmyj okna które mają typ 'dock'"
+msgstr "Rozmyj docki"
 
 #. i18n: file: effects_cpp/wayland/kde-effects-aeroglassblur/src/kcm/blur_config.ui:409
 #. i18n: ectx: property (text), widget (QCheckBox, kcfg_OpaqueKrunner)
@@ -457,7 +461,7 @@ msgstr "Uczyń komunikaty ekranowe nieprzezroczystymi"
 msgid ""
 "Paint windows as non-opaque (fixes artifacts for some transparent windows)"
 msgstr ""
-"Rysuj okna jako nie w pełni nieprzezroczyste (naprawia artefakty w "
+"Rysuj okna jako nie w pełni nieprzezroczyste (naprawia artefakty, w "
 "niektórych przezroczystych oknach)"
 
 #. i18n: file: effects_cpp/wayland/kde-effects-aeroglassblur/src/kcm/blur_config.ui:430
@@ -469,7 +473,8 @@ msgstr ""
 msgid ""
 "Don't render blur on the inside of Firefox windows (disabling this reduces "
 "performance)"
-msgstr "Nie stosuj rozmycia wewnątrz okien Firefoxa (wyłączenie tego obniża wydajność)"
+msgstr ""
+"Nie stosuj rozmycia wewnątrz okien Firefoxa (wyłączenie tego obniża wydajność)"
 
 #. i18n: file: effects_cpp/wayland/kde-effects-aeroglassblur/src/kcm/blur_config.ui:450
 #. i18n: ectx: property (text), widget (QLabel, label_4)
@@ -478,7 +483,8 @@ msgstr "Nie stosuj rozmycia wewnątrz okien Firefoxa (wyłączenie tego obniża 
 #: rc.cpp:154 rc.cpp:376
 #, kde-format
 msgid "Firefox blur corner radius (radius gets DPI scaled by the effect)"
-msgstr "Promień zaokrąglenia rozmycia w Firefoksie (reaguje na skalowanie ekranu)"
+msgstr ""
+"Promień zaokrąglenia rozmycia w Firefoxie (reaguje na skalowanie ekranu)"
 
 #. i18n: file: effects_cpp/wayland/kde-effects-aeroglassblur/src/kcm/blur_config.ui:469
 #. i18n: ectx: property (suffix), widget (QSpinBox, kcfg_FirefoxBlurTopMargin)
@@ -572,7 +578,7 @@ msgstr "Zielony:"
 #: rc.cpp:181 rc.cpp:403
 #, kde-format
 msgid "Blue:"
-msgstr "Niebieska:"
+msgstr "Niebieski:"
 
 #. i18n: file: effects_cpp/wayland/kde-effects-aeroglassblur/src/kcm/blur_config.ui:548
 #. i18n: ectx: property (text), widget (QLabel, label_12)
@@ -602,7 +608,7 @@ msgid ""
 "Enables/disables the transparency of the entire theme. \n"
 "NOTE: This setting does NOT affect compositing settings."
 msgstr ""
-"Przełącza przezroczystość całego motywu."
+"Przełącza przezroczystość całego motywu. \n"
 "UWAGA: To ustawienie NIE wpływa na ustawienia kompozycji"
 
 #. i18n: file: effects_cpp/wayland/kde-effects-aeroglassblur/src/kcm/mainwindow.ui:247
@@ -612,7 +618,7 @@ msgstr ""
 #: rc.cpp:198 rc.cpp:420
 #, kde-format
 msgid "Enable transparency"
-msgstr "Włącz przeźroczystość"
+msgstr "Włącz przezroczystość"
 
 #. i18n: file: effects_cpp/wayland/kde-effects-aeroglassblur/src/kcm/mainwindow.ui:284
 #. i18n: ectx: property (text), widget (QLabel, label)
