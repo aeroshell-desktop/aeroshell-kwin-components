@@ -7,6 +7,7 @@
         ],
         "Category": "AeroShell",
         "Description": "Show an animation when a resizable window is dragged to a screen edge",
+        "Description[pl]": "Pokazuj animacje gdy modyfikowalne okno jest przyciągane do krawędzi ekranu",
         "EnabledByDefault": false,
         "Id": "smodsnap",
         "License": "GPL",

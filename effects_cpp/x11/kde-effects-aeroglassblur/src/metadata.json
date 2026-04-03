@@ -7,9 +7,11 @@
         ],
         "Category": "AeroShell",
         "Description": "Blurs the background behind windows in the style of Windows 7 and Vista. Conflicts with the original blur effect!",
+        "Description[pl]": "Rozmywa tło za oknem w stylu Windows 7 i Vista. Konfliktuje z oryginalnym efektem rozmycia!",
         "EnabledByDefault": false,
         "License": "GPL",
-        "Name": "Aero Glass Blur"
+        "Name": "Aero Glass Blur",
+        "Name[pl]": "Rozmycie Aero"       
     },
     "X-KDE-ConfigModule": "kwin_aeroglassblur_config"
 }

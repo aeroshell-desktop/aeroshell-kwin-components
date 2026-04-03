@@ -47,7 +47,8 @@
         "Icon": "preferences-system-windows-switcher-thumbnail-grid",
         "Id": "thumbnail_aero",
         "License": "AGPLv3",
-        "Name": "Thumbnail Aero"
+        "Name": "Thumbnail Aero",
+        "Name[pl]": "Miniatury Aero"
     },
     "X-Plasma-API": "declarativeappletscript"
 }
