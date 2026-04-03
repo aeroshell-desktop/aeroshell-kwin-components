@@ -56,11 +56,13 @@
         ],
         "Category": "AeroShell",
         "Description": "Effect that adds the animations for window previews in task manager thumbnails",
+        "Description[pl]": "Efekt który dodaje animacje dla podglądu okien w miniaturach paska zadań",
         "EnabledByDefault": true,
         "Icon": "preferences-system-windows-effect-morphingpopups",
         "Id": "aeroshell-thumbnails",
         "License": "GPL",
-        "Name": "Animations for Task Manager Thumbnails"
+        "Name": "Animations for Task Manager Thumbnails",
+        "Name[pl]": "Animacje dla miniatur paska zadań"
     },
     "X-KDE-Ordering": 60,
     "X-Plasma-API": "javascript"
