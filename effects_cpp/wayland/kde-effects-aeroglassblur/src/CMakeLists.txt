@@ -12,6 +12,12 @@ kconfig_add_kcfg_files(aeroglassblur_SOURCES
 
 if (KWIN_BUILD_WAYLAND)
     add_library(aeroglassblur MODULE ${aeroglassblur_SOURCES})
+
+    qt6_generate_wayland_protocol_server_sources(aeroglassblur
+        "PRIVATE_CODE"
+        FILES
+            ${WaylandProtocols_DATADIR}/staging/ext-background-effect/ext-background-effect-v1.xml
+    )
     
     target_link_libraries(aeroglassblur PRIVATE
         KF6::ConfigGui

@@ -1,3 +1,5 @@
+#version 140
+
 uniform sampler2D texUnit;
 uniform float offset;
 uniform vec2 halfpixel;

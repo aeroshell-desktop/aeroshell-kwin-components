@@ -18,10 +18,11 @@
 #include "core/output.h"
 #include "effect/effecthandler.h"
 #include "opengl/glplatform.h"
-//#include "utils/xcbutils.h"
-#include "wayland/blur.h"
+#include "scene/backgroundeffectitem.h"
+#include "wayland/backgroundeffect_v1.h"
 #include "wayland/display.h"
 #include "wayland/surface.h"
+#include "wayland_server.h"
 #include "scene/scene.h"
 
 #include <QGuiApplication>
@@ -61,11 +62,6 @@ static void ensureResources()
 
 namespace KWin
 {
-
-static const QByteArray s_blurAtomName = QByteArrayLiteral("_KDE_NET_WM_BLUR_BEHIND_REGION");
-
-BlurManagerInterface *BlurEffect::s_blurManager = nullptr;
-QTimer *BlurEffect::s_blurManagerRemoveTimer = nullptr;
 
 BlurEffect::BlurEffect() : m_sharedMemory("kwinaero")
 {
@@ -158,25 +154,7 @@ BlurEffect::BlurEffect() : m_sharedMemory("kwinaero")
     initBlurStrengthValues();
     reconfigure(ReconfigureAll);
 
-    /*
-    if (effects->xcbConnection()) {
-        net_wm_blur_region = effects->announceSupportProperty(s_blurAtomName, this);
-    }*/
-
-    if (effects->waylandDisplay()) {
-        if (!s_blurManagerRemoveTimer) {
-            s_blurManagerRemoveTimer = new QTimer(QCoreApplication::instance());
-            s_blurManagerRemoveTimer->setSingleShot(true);
-            s_blurManagerRemoveTimer->callOnTimeout([]() {
-                s_blurManager->remove();
-                s_blurManager = nullptr;
-            });
-        }
-        s_blurManagerRemoveTimer->stop();
-        if (!s_blurManager) {
-            s_blurManager = new BlurManagerInterface(effects->waylandDisplay(), s_blurManagerRemoveTimer);
-        }
-    }
+    waylandServer()->backgroundEffectManager()->addBlurCapability();
 
     connect(effects, &EffectsHandler::windowAdded, this, &BlurEffect::slotWindowAdded);
     connect(effects, &EffectsHandler::windowDeleted, this, &BlurEffect::slotWindowDeleted);
@@ -188,16 +166,11 @@ BlurEffect::BlurEffect() : m_sharedMemory("kwinaero")
     }
 
     m_valid = true;
-
-
 }
 
 BlurEffect::~BlurEffect()
 {
-    // When compositing is restarted, avoid removing the manager immediately.
-    if (s_blurManager) {
-        s_blurManagerRemoveTimer->start(1000);
-    }
+    waylandServer()->backgroundEffectManager()->removeBlurCapability();
 }
 
 
@@ -292,7 +265,6 @@ bool BlurEffect::readMemory(bool *skipFunc)
 void BlurEffect::reconfigure(ReconfigureFlags flags)
 {
 	auto configureAero = [&]() {
-
    		float fR = 0, fG = 0, fB = 0, fH = 0, fS = 0, fV = 0;
 
    		fH = (float)m_aeroHue;
@@ -325,8 +297,8 @@ void BlurEffect::reconfigure(ReconfigureFlags flags)
 	if(skip && m_firstTimeConfig)
 	{
 		configureAero();
-        for (EffectWindow *w : effects->stackingOrder()) {
-            updateBlurRegion(w);
+        for (auto &[window, data] : m_windows) {
+            data.blurItem->setPixelsToExpandRepaintsBelowOpaqueRegions(m_expandSize);
         }
         effects->addRepaintFull();
 		return;
@@ -373,8 +345,8 @@ void BlurEffect::reconfigure(ReconfigureFlags flags)
 	ensureReflectTexture();
 
 	m_firstTimeConfig = true;
-    for (EffectWindow *w : effects->stackingOrder()) {
-        updateBlurRegion(w);
+    for (auto &[window, data] : m_windows) {
+        data.blurItem->setPixelsToExpandRepaintsBelowOpaqueRegions(m_expandSize);
     }
 
     // Update all windows for the blur to take effect
@@ -446,8 +418,8 @@ void BlurEffect::updateBlurRegion(EffectWindow *w)
 
     SurfaceInterface *surf = w->surface();
 
-    if (surf && surf->blur()) {
-        content = surf->blur()->region();
+    if (surf && !surf->blurRegion().isEmpty()) {
+        content = surf->blurRegion().rounded();
     }
 
     if (auto internal = w->internalWindow()) {
@@ -492,6 +464,11 @@ void BlurEffect::updateBlurRegion(EffectWindow *w)
         BlurEffectData &data = m_windows[w];
         data.content = content;
         data.frame = frame;
+        if (!data.blurItem) {
+            data.blurItem = std::make_unique<BackgroundEffectItem>(w->windowItem());
+        }
+        data.blurItem->setPixelsToExpandRepaintsBelowOpaqueRegions(m_expandSize);
+        data.blurItem->setEffectBoundingRect(blurRegion(w).boundingRect());
     } else {
         if (auto it = m_windows.find(w); it != m_windows.end()) {
             effects->makeOpenGLContextCurrent();
@@ -691,12 +668,9 @@ Region BlurEffect::blurRegion(EffectWindow *w, bool noRoundedCorners)
     return region;
 }
 
-void BlurEffect::prePaintScreen(ScreenPrePaintData &data, std::chrono::milliseconds presentTime)
+void BlurEffect::prePaintScreen(ScreenPrePaintData &data)
 {
-    m_paintedDeviceArea = Region();
-    m_currentDeviceBlur = Region();
     m_currentView = data.view;
-
 
     // We can avoid checking for every window by evaluating the condition here
     auto maximizedWindowsOnCurrentActivity = [&]() -> bool {
@@ -707,54 +681,16 @@ void BlurEffect::prePaintScreen(ScreenPrePaintData &data, std::chrono::milliseco
         m_maximizedWindowsInCurrentActivity = maximizedWindowsOnCurrentActivity();
     }
 
-    effects->prePaintScreen(data, presentTime);
+    effects->prePaintScreen(data);
 }
 
-void BlurEffect::prePaintWindow(RenderView *view, EffectWindow *w, WindowPrePaintData &data, std::chrono::milliseconds presentTime)
+void BlurEffect::prePaintWindow(RenderView *view, EffectWindow *w, WindowPrePaintData &data)
 {
     if(isFirefoxWindowValid(w))
     {
         data.setTranslucent();
     }
-    effects->prePaintWindow(view, w, data, presentTime);
-
-    const Region oldOpaque = data.deviceOpaque;
-    if (data.deviceOpaque.intersects(m_currentDeviceBlur)) {
-        // to blur an area partially we have to shrink the opaque area of a window
-        Region newOpaque;
-        for (const Rect &rect : data.deviceOpaque.rects()) {
-            newOpaque += rect.adjusted(m_expandSize, m_expandSize, -m_expandSize, -m_expandSize);
-        }
-        data.deviceOpaque = newOpaque;
-
-        // we don't have to blur a region we don't see
-        m_currentDeviceBlur -= newOpaque;
-    }
-
-    // if we have to paint a non-opaque part of this window that intersects with the
-    // currently blurred region we have to redraw the whole region
-    if ((data.devicePaint - oldOpaque).intersects(m_currentDeviceBlur)) {
-        data.devicePaint += m_currentDeviceBlur;
-    }
-
-    // in case this window has regions to be blurred
-    const Region blurArea = view->mapToDeviceCoordinatesAligned(QRectF(blurRegion(w).boundingRect()).translated(w->pos()));
-
-    // if this window or a window underneath the blurred area is painted again we have to
-    // blur everything
-    if (m_paintedDeviceArea.intersects(blurArea) || data.devicePaint.intersects(blurArea)) {
-        data.devicePaint += blurArea;
-        // we have to check again whether we do not damage a blurred area
-        // of a window
-        if (blurArea.intersects(m_currentDeviceBlur)) {
-            data.devicePaint += m_currentDeviceBlur;
-        }
-    }
-
-    m_currentDeviceBlur += blurArea;
-
-    m_paintedDeviceArea -= data.deviceOpaque;
-    m_paintedDeviceArea += data.devicePaint;
+    effects->prePaintWindow(view, w, data);
 }
 
 bool BlurEffect::scaledOrTransformed(const EffectWindow *w, int mask, const WindowPaintData &data) const
@@ -897,7 +833,7 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
         blurShape.translate(std::round(data.xTranslation()), std::round(data.yTranslation()));
     }
 
-    QRect backgroundRect = blurShape.boundingRect();
+    Rect backgroundRect = blurShape.boundingRect();
 
     /*
      * The new way of downsampling works reliably for textures with
@@ -909,7 +845,7 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
         backgroundRect.setWidth(backgroundRect.width() - 1);
     if(backgroundRect.height() % 2 != 0)
         backgroundRect.setHeight(backgroundRect.height() - 1);
-    const QRect scaledBackgroundRect = snapToPixelGrid(scaledRect(backgroundRect, viewport.scale()));
+    const QRect scaledBackgroundRect = snapToPixelGrid(backgroundRect.scaled(viewport.scale()));
     const QRect deviceBackgroundRect = snapToPixelGrid(viewport.mapToDeviceCoordinates(backgroundRect));
 
     QVariant opacityData = w->data(OPACITY_DATA);

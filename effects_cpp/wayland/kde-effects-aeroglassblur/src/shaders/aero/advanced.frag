@@ -1,7 +1,9 @@
+#version 140
 
 uniform sampler2D texUnit;
 uniform float offset;
 uniform vec2 halfpixel;
+uniform mat4 colorMatrix;
 
 uniform float aeroColorR;
 uniform float aeroColorG;
@@ -11,9 +13,9 @@ uniform float aeroColorBalance;
 uniform float aeroAfterglowBalance;
 uniform float aeroBlurBalance;
 
-uniform mat4 colorMatrix;
-
 varying vec2 uv;
+
+out vec4 fragColor;
 
 void main(void)
 {
@@ -31,10 +33,9 @@ void main(void)
     color *= colorMatrix;
     vec3 primaryColor   = color.rgb;
     vec3 secondaryColor = color.rgb;
-    vec3 primaryLayer   = primaryColor * aeroColorBalance //pow(aeroColorBalance, 1.1);
+    vec3 primaryLayer   = primaryColor * aeroColorBalance; //pow(aeroColorBalance, 1.1);
     vec3 secondaryLayer = (secondaryColor * dot(sum.xyz, vec3(0.299, 0.587, 0.114))) * aeroAfterglowBalance;
     vec3 blurLayer      = sum.xyz * aeroBlurBalance;
 
-    gl_FragColor = vec4(primaryLayer + secondaryLayer + blurLayer, 1.0);
-
+    fragColor = vec4(primaryLayer + secondaryLayer + blurLayer, 1.0);
 }

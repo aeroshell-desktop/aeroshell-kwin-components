@@ -26,7 +26,7 @@
 namespace KWin
 {
 
-class BlurManagerInterface;
+class BackgroundEffectItem;
 
 struct BlurRenderData
 {
@@ -44,8 +44,13 @@ struct BlurEffectData
     /// The region that should be blurred behind the frame
     std::optional<Region> frame;
 
-    /// The render data per screen. Screens can have different color spaces.
+    /**
+     * The render data per render view, as they can have different
+     *  color spaces and even different windows on them
+     */
     std::unordered_map<RenderView *, BlurRenderData> render;
+
+    std::unique_ptr<BackgroundEffectItem> blurItem;
 };
 
 class BlurEffect : public KWin::Effect
@@ -60,8 +65,8 @@ public:
     static bool enabledByDefault();
 
     void reconfigure(ReconfigureFlags flags) override;
-    void prePaintScreen(ScreenPrePaintData &data, std::chrono::milliseconds presentTime) override;
-    void prePaintWindow(RenderView *view, EffectWindow *w, WindowPrePaintData &data, std::chrono::milliseconds presentTime) override;
+    void prePaintScreen(ScreenPrePaintData &data) override;
+    void prePaintWindow(RenderView *view, EffectWindow *w, WindowPrePaintData &data) override;
     void drawWindow(const RenderTarget &renderTarget, const RenderViewport &viewport, EffectWindow *w, int mask, const Region &deviceRegion, WindowPaintData &data) override;
     QMatrix4x4 colorMatrix(const float &brightness, const float &saturation) const;
 
@@ -256,8 +261,6 @@ private:
     std::unordered_map<EffectWindow *, BlurEffectData> m_windows;
     std::list<EffectWindow*> m_maximizedWindows;
 
-    static BlurManagerInterface *s_blurManager;
-    static QTimer *s_blurManagerRemoveTimer;
     QSharedMemory m_sharedMemory;
 
 };

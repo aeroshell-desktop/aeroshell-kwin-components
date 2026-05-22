@@ -24,6 +24,8 @@ find_package(KF6 REQUIRED COMPONENTS
     Config
 )
 
+find_package(Vulkan REQUIRED)
+
 remove_definitions(-DQT_NO_CAST_FROM_ASCII)
 add_subdirectory(effects_cpp)
 

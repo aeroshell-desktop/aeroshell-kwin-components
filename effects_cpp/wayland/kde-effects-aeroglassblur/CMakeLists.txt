@@ -36,6 +36,8 @@ find_package(Qt6 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS
     OpenGL
     Network
     Xml
+    WaylandClientPrivate
+    WaylandClient
 )
 
 include_directories(${Qt6Widgets_INCLUDE_DIRS} ${Qt6Network_INCLUDE_DIRS} ${Qt6OpenGL_INCLUDE_DIRS} ${Qt6Xml_INCLUDE_DIRS})
@@ -59,6 +61,14 @@ find_package(KF6 ${KF_MIN_VERSION} REQUIRED COMPONENTS
     KCMUtils
     
 )
+
+find_package(WaylandProtocols 1.48)
+set_package_properties(WaylandProtocols PROPERTIES
+    TYPE REQUIRED
+    PURPOSE "Collection of Wayland protocols that add functionality not available in the Wayland core protocol"
+    URL "https://gitlab.freedesktop.org/wayland/wayland-protocols/"
+)
+
 find_package(KF6Svg REQUIRED)
 find_package(KF6WindowSystem REQUIRED)
 find_package(epoxy REQUIRED)
@@ -66,15 +76,9 @@ find_package(epoxy REQUIRED)
 find_package(X11 REQUIRED)
 find_package(XCB REQUIRED COMPONENTS XCB)
 
-if (KWIN_BUILD_WAYLAND)
-    find_package(KWin REQUIRED COMPONENTS
-        kwineffects
-    )
-else()
-    find_package(KWinX11 REQUIRED COMPONENTS
-        kwineffects
-    )
-endif()
+find_package(KWin REQUIRED COMPONENTS
+    kwineffects
+)
 
 find_package(KDecoration3 REQUIRED)
 
