@@ -98,7 +98,7 @@ void GlideEffect::reconfigure(ReconfigureFlags flags)
     m_outParams.opacity.to = GlideConfig::outOpacity();
 }
 
-void GlideEffect::prePaintWindow(RenderView *view, EffectWindow *w, WindowPrePaintData &data, std::chrono::milliseconds presentTime)
+void GlideEffect::prePaintWindow(RenderView *view, EffectWindow *w, WindowPrePaintData &data)
 {
     auto animationIt = m_animations.find(w);
     if (animationIt != m_animations.end()) {
@@ -115,10 +115,10 @@ void GlideEffect::prePaintWindow(RenderView *view, EffectWindow *w, WindowPrePai
         w->setData(TRANSFORMATION_DATA, calculateTransform(w, params, t));
         w->setData(OPACITY_DATA, newOpacity);
         // Advance timing after calculating the transform data, this way the blur effect can actually catch up with the transformed window
-        animationIt->second.timeLine.advance(presentTime);
+        animationIt->second.timeLine.advance(view);
         data.setTransformed(); // Mark the window as transformed
     }
-    effects->prePaintWindow(view, w, data, presentTime);
+    effects->prePaintWindow(view, w, data);
 }
 
 QMatrix4x4 GlideEffect::calculateTransform(EffectWindow *window, const GlideParams &params, qreal t)
