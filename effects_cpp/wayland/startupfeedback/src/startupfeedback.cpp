@@ -78,12 +78,10 @@ StartupFeedbackEffect::StartupFeedbackEffect()
     : m_bounceSizesRatio(1.0)
 #if KWIN_BUILD_X11
     , m_startupInfo(new KStartupInfo(KStartupInfo::CleanOnCantDetect, this))
-    , m_selection(nullptr)
 #endif
     , m_active(false)
     , m_frame(0)
     , m_progress(0)
-    , m_lastPresentTime(std::chrono::milliseconds::zero())
     , m_type(BouncingFeedback)
     , m_cursorSize(24)
     , m_configWatcher(KConfigWatcher::create(KSharedConfig::openConfig("klaunchfeedbackrc", KConfig::NoGlobals)))
@@ -91,11 +89,6 @@ StartupFeedbackEffect::StartupFeedbackEffect()
     , m_mouseCur(Cursors::self()->mouse())
 {
 #if KWIN_BUILD_X11
-    // TODO: move somewhere that is x11-specific
-    if (KWindowSystem::isPlatformX11()) {
-        m_selection = new KSelectionOwner("_KDE_STARTUP_FEEDBACK", effects->xcbConnection(), effects->x11RootWindow(), this);
-        m_selection->claim(true);
-    }
     connect(m_startupInfo, &KStartupInfo::gotNewStartup, this, [](const KStartupInfoId &id, const KStartupInfoData &data) {
         const auto icon = QIcon::fromTheme(data.findIcon(), QIcon::fromTheme(QStringLiteral("system-run")));
         Q_EMIT effects->startupAdded(id.id(), icon);
@@ -160,7 +153,7 @@ void StartupFeedbackEffect::reconfigure(Effect::ReconfigureFlags flags)
         if (effects->compositingType() == OpenGLCompositing) {
             ensureResources();
             m_blinkingShader = ShaderManager::instance()->generateShaderFromFile(ShaderTrait::MapTexture, QString(), QStringLiteral(":/effects/startupfeedback/shaders/blinking-startup.frag"));
-            if (m_blinkingShader->isValid()) {
+            if (m_blinkingShader) {
                 qCDebug(KWIN_STARTUPFEEDBACK) << "Blinking Shader is valid";
             } else {
                 qCDebug(KWIN_STARTUPFEEDBACK) << "Blinking Shader is not valid";
@@ -175,13 +168,9 @@ void StartupFeedbackEffect::reconfigure(Effect::ReconfigureFlags flags)
     }
 }
 
-void StartupFeedbackEffect::prePaintScreen(ScreenPrePaintData &data, std::chrono::milliseconds presentTime)
+void StartupFeedbackEffect::prePaintScreen(ScreenPrePaintData &data)
 {
-    int time = 0;
-    if (m_lastPresentTime.count()) {
-        time = (presentTime - m_lastPresentTime).count();
-    }
-    m_lastPresentTime = presentTime;
+    const int time = m_clock.tick(data.view).count();
 
     //if (m_active /*&& effects->isCursorHidden()*/) {
         //stop();
@@ -204,7 +193,7 @@ void StartupFeedbackEffect::prePaintScreen(ScreenPrePaintData &data, std::chrono
         }
     }
     if(m_cursorItem) m_cursorItem->refresh();
-    effects->prePaintScreen(data, presentTime);
+    effects->prePaintScreen(data);
 }
 
 void StartupFeedbackEffect::paintScreen(const RenderTarget &renderTarget, const RenderViewport &viewport, int mask, const Region &region, LogicalOutput *screen)
@@ -234,7 +223,7 @@ void StartupFeedbackEffect::paintScreen(const RenderTarget &renderTarget, const 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         GLShader *shader = nullptr;
-        if (m_type == BlinkingFeedback && m_blinkingShader && m_blinkingShader->isValid()) {
+        if (m_type == BlinkingFeedback && m_blinkingShader) {
             const QColor &blinkingColor = BLINKING_COLORS[FRAME_TO_BLINKING_COLOR[m_frame]];
             ShaderManager::instance()->pushShader(m_blinkingShader.get());
             shader = m_blinkingShader.get();
@@ -242,7 +231,7 @@ void StartupFeedbackEffect::paintScreen(const RenderTarget &renderTarget, const 
         } else {
             shader = ShaderManager::instance()->pushShader(ShaderTrait::MapTexture | ShaderTrait::TransformColorspace);
         }
-        const QRectF pixelGeometry = snapToPixelGridF(scaledRect(m_currentGeometry, viewport.scale()));
+        const Rect pixelGeometry = m_currentGeometry.scaled(viewport.scale()).rounded();
         QMatrix4x4 mvp = viewport.projectionMatrix();
         mvp.translate(pixelGeometry.x(), pixelGeometry.y());
         shader->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);
@@ -355,8 +344,8 @@ void StartupFeedbackEffect::start(const Startup &startup)
         m_bounceSizesRatio = iconSize / 16.0;
     }
 
-    const QPixmap iconPixmap = startup.icon.pixmap(iconSize);
-    prepareTextures(iconPixmap, output->scale());
+    const QPixmap iconPixmap = startup.icon.pixmap(QSize(iconSize, iconSize), output->scale());
+    prepareTextures(iconPixmap);
     m_dirtyRect = m_currentGeometry = feedbackRect();
     m_cursorTheme = CursorTheme(m_mouseCur->themeName(),
                                 m_mouseCur->themeSize(),
@@ -405,13 +394,13 @@ void StartupFeedbackEffect::stop()
     if (!m_active) {
         return;
     }
-    m_lastPresentTime = std::chrono::milliseconds::zero();
     disconnect(effects, &EffectsHandler::mouseChanged, this, &StartupFeedbackEffect::slotMouseChanged);
     m_showBusyCursor = false;
     while(effects->isCursorHidden()) {
         effects->showCursor();
     }
     m_active = false;
+    m_clock.reset();
     effects->makeOpenGLContextCurrent();
     switch (m_type) {
     case BouncingFeedback:
@@ -431,13 +420,13 @@ void StartupFeedbackEffect::stop()
     effects->addRepaintFull();
 }
 
-void StartupFeedbackEffect::prepareTextures(const QPixmap &pix, qreal devicePixelRatio)
+void StartupFeedbackEffect::prepareTextures(const QPixmap &pix)
 {
     effects->makeOpenGLContextCurrent();
     switch (m_type) {
     case BouncingFeedback:
         for (int i = 0; i < 5; ++i) {
-            m_bouncingTextures[i] = GLTexture::upload(scalePixmap(pix, BOUNCE_SIZES[i], devicePixelRatio));
+            m_bouncingTextures[i] = GLTexture::upload(scalePixmap(pix, BOUNCE_SIZES[i]));
             if (!m_bouncingTextures[i]) {
                 return;
             }
@@ -461,25 +450,24 @@ void StartupFeedbackEffect::prepareTextures(const QPixmap &pix, qreal devicePixe
     }
 }
 
-QImage StartupFeedbackEffect::scalePixmap(const QPixmap &pm, const QSize &size, qreal devicePixelRatio) const
+QImage StartupFeedbackEffect::scalePixmap(const QPixmap &pm, const QSize &size) const
 {
+    const qreal devicePixelRatio = pm.devicePixelRatioF();
     const QSize &adjustedSize = size * m_bounceSizesRatio;
-    QImage scaled = pm.toImage().scaled(adjustedSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-    if (scaled.format() != QImage::Format_ARGB32_Premultiplied && scaled.format() != QImage::Format_ARGB32) {
-        scaled.convertTo(QImage::Format_ARGB32);
-    }
 
-    QImage result(feedbackIconSize() * devicePixelRatio, QImage::Format_ARGB32);
+    QImage result(feedbackIconSize() * devicePixelRatio, QImage::Format_ARGB32_Premultiplied);
+    result.fill(Qt::transparent);
     result.setDevicePixelRatio(devicePixelRatio);
 
     QPainter p(&result);
+    p.setRenderHint(QPainter::SmoothPixmapTransform);
     p.setCompositionMode(QPainter::CompositionMode_Source);
-    p.fillRect(result.rect(), Qt::transparent);
-    p.drawImage(QRectF((20 * m_bounceSizesRatio - adjustedSize.width()) / 2,
-                       (20 * m_bounceSizesRatio - adjustedSize.height()) / 2,
-                       adjustedSize.width(),
-                       adjustedSize.height()),
-                scaled);
+    p.drawPixmap(QRectF((20 * m_bounceSizesRatio - adjustedSize.width()) / 2,
+                        (20 * m_bounceSizesRatio - adjustedSize.height()) / 2,
+                        adjustedSize.width(),
+                        adjustedSize.height()),
+                 pm,
+                 pm.rect());
     return result;
 }
 
@@ -488,7 +476,7 @@ QSize StartupFeedbackEffect::feedbackIconSize() const
     return QSize(20, 20) * m_bounceSizesRatio;
 }
 
-QRect StartupFeedbackEffect::feedbackRect() const
+Rect StartupFeedbackEffect::feedbackRect() const
 {
     int xDiff;
     if (m_cursorSize <= 16) {
@@ -517,9 +505,9 @@ QRect StartupFeedbackEffect::feedbackRect() const
         break;
     }
     const QPoint cursorPos = effects->cursorPos().toPoint() + QPoint(xDiff, yDiff + yOffset);
-    QRect rect;
+    Rect rect;
     if (texture) {
-        rect = QRect(cursorPos, feedbackIconSize());
+        rect = Rect(cursorPos, feedbackIconSize());
     }
     return rect;
 }
@@ -542,12 +530,9 @@ ShakeCursorItem::ShakeCursorItem(const CursorTheme &theme, Item *parent)
 
 void ShakeCursorItem::refresh()
 {
-    if (!m_imageItem) {
-        m_imageItem = scene()->renderer()->createImageItem(this);
+    if (!m_imageTexture) {
+        m_imageTexture = scene()->renderer()->createTexture(m_source->image());
     }
-    m_imageItem->setImage(m_source->image());
-    m_imageItem->setPosition(-m_source->hotspot());
-    m_imageItem->setSize(m_source->image().deviceIndependentSize());
 }
 
 

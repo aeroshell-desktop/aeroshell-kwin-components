@@ -10,11 +10,12 @@
 #pragma once
 #include <KConfigWatcher>
 #include "effect/effect.h"
+#include "effect/timeline.h"
 #include "cursor.h"
 #include "cursorsource.h"
 #include "scene/cursoritem.h"
-#include "scene/imageitem.h"
 #include "scene/scene.h"
+#include "scene/texture.h"
 #include "scene/itemrenderer.h"
 #include "scene/workspacescene.h"
 
@@ -26,7 +27,6 @@
 
 #include <chrono>
 
-class KSelectionOwner;
 namespace KWin
 {
 
@@ -43,7 +43,7 @@ public:
 
 private:
 
-    std::unique_ptr<ImageItem> m_imageItem;
+    std::unique_ptr<Texture> m_imageTexture;
     std::unique_ptr<ShapeCursorSource> m_source;
 };
 
@@ -57,7 +57,7 @@ public:
     ~StartupFeedbackEffect() override;
 
     void reconfigure(ReconfigureFlags flags) override;
-    void prePaintScreen(ScreenPrePaintData &data, std::chrono::milliseconds presentTime) override;
+    void prePaintScreen(ScreenPrePaintData &data) override;
     void paintScreen(const RenderTarget &renderTarget, const RenderViewport &viewport, int mask, const Region &region, LogicalOutput *screen) override;
     void postPaintScreen() override;
     bool isActive() const override;
@@ -97,9 +97,9 @@ private:
 
     void start(const Startup &startup);
     void stop();
-    QImage scalePixmap(const QPixmap &pm, const QSize &size, qreal devicePixelRatio) const;
-    void prepareTextures(const QPixmap &pix, qreal devicePixelRatio);
-    QRect feedbackRect() const;
+    QImage scalePixmap(const QPixmap &pm, const QSize &size) const;
+    void prepareTextures(const QPixmap &pix);
+    Rect feedbackRect() const;
     QSize feedbackIconSize() const;
 
 
@@ -113,18 +113,17 @@ private:
     qreal m_bounceSizesRatio;
 #if KWIN_BUILD_X11
     KStartupInfo *m_startupInfo;
-    KSelectionOwner *m_selection;
 #endif
     QString m_currentStartup;
     QMap<QString, Startup> m_startups;
     bool m_active;
     int m_frame;
     int m_progress;
-    std::chrono::milliseconds m_lastPresentTime;
+    AnimationClock m_clock;
     std::unique_ptr<GLTexture> m_bouncingTextures[5];
     std::unique_ptr<GLTexture> m_texture; // for passive and blinking
     FeedbackType m_type;
-    QRect m_currentGeometry, m_dirtyRect;
+    Rect m_currentGeometry, m_dirtyRect;
     std::unique_ptr<GLShader> m_blinkingShader;
     int m_cursorSize;
     KConfigWatcher::Ptr m_configWatcher;
