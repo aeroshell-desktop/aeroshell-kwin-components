@@ -26,8 +26,7 @@ void SmodSnapEffect::loadTextures()
 
     m_texture.resize(m_frames);
 
-    for (int i = 0; i < m_frames; ++i)
-    {
+    for (int i = 0; i < m_frames; ++i) {
         m_texture[i] = GLTexture::upload(QPixmap(QStringLiteral(":/effects/smodsnap/animation/frame") + QString::number(i + 1)));
         m_texture[i]->setFilter(GL_LINEAR);
         m_texture[i]->setWrapMode(GL_CLAMP_TO_EDGE);
@@ -38,17 +37,15 @@ void SmodSnapEffect::paintScreen(const RenderTarget &renderTarget, const RenderV
 {
     effects->paintScreen(renderTarget, viewport, mask, region, screen);
 
-    if (anim1->m_active || anim2->m_active)
-    {
+    if (anim1->m_active || anim2->m_active) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         ShaderManager::instance()->pushShader(m_shader.get());
 
         const auto scale = viewport.scale();
 
-        if (!anim1->m_finished)
-        {
-            const QRectF pixelGeometry = snapToPixelGridF(scaledRect(anim1->m_rect, scale));
+        if (!anim1->m_finished) {
+            const QRectF pixelGeometry = snapToPixelGridF(anim1->m_rect.scaled(scale));
             QMatrix4x4 mvp = viewport.projectionMatrix();
             mvp.translate(anim1->m_rect.x(), anim1->m_rect.y());
             m_shader->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);
@@ -56,9 +53,8 @@ void SmodSnapEffect::paintScreen(const RenderTarget &renderTarget, const RenderV
             texture->render(pixelGeometry.size());
         }
 
-        if (!anim2->m_finished)
-        {
-            const QRectF pixelGeometry = snapToPixelGridF(scaledRect(anim2->m_rect, scale));
+        if (!anim2->m_finished) {
+            const QRectF pixelGeometry = snapToPixelGridF(anim2->m_rect.scaled(scale));
             QMatrix4x4 mvp = viewport.projectionMatrix();
             mvp.translate(anim2->m_rect.x(), anim2->m_rect.y());
             m_shader->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);

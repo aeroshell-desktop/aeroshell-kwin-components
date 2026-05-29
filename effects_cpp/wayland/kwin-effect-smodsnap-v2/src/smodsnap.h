@@ -10,9 +10,7 @@
 
 #include <QObject>
 
-#define IS_KF6 QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-
-#if IS_KF6
+#include "effect/timeline.h"
 #include "effect/effecthandler.h"
 #include "effect/effectwindow.h"
 #include "opengl/glshadermanager.h"
@@ -20,10 +18,6 @@
 #include "opengl/gltexture.h"
 #include "core/renderviewport.h"
 #include "core/pixelgrid.h"
-#else
-#include <kwineffects.h>
-#include <kwinglutils.h>
-#endif
 
 namespace KWin
 {
@@ -33,14 +27,16 @@ class SnapAnimation : public QObject
     Q_OBJECT
 
 public:
-    SnapAnimation() {};
+    SnapAnimation()
+    {
+    }
 
     bool m_active = false;
     bool m_finished = false;
     int m_frame = 0;
     int m_progress = 0;
-    std::chrono::milliseconds m_lastPresentTime = std::chrono::milliseconds{0};
-    QRect m_rect = QRect();
+    AnimationClock m_clock;
+    Rect m_rect{};
 };
 
 class SmodSnapEffect : public Effect
@@ -52,12 +48,8 @@ public:
     ~SmodSnapEffect() override;
 
     void reconfigure(ReconfigureFlags flags) override;
-    void prePaintScreen(ScreenPrePaintData &data, std::chrono::milliseconds presentTime) override;
-#if IS_KF6
+    void prePaintScreen(ScreenPrePaintData &data) override;
     void paintScreen(const RenderTarget &renderTarget, const RenderViewport &viewport, int mask, const Region &region, LogicalOutput *screen) override;
-#else
-    void paintScreen(int mask, const QRegion &region, ScreenPaintData &data) override;
-#endif
     void postPaintScreen() override;
 
     static bool supported();

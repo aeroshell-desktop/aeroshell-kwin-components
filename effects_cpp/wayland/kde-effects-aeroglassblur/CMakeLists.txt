@@ -20,7 +20,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DQT_NO_DEBUG_OUTPUT")
 find_package(ECM REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
 
-option(KWIN_BUILD_WAYLAND "Build with Wayland support" OFF)
+option(KWIN_BUILD_WAYLAND "Build with Wayland support" ON)
 
 include(FeatureSummary)
 include(KDEInstallDirs)
@@ -48,11 +48,9 @@ find_package(KF6 ${KF_MIN_VERSION} REQUIRED COMPONENTS
     ConfigWidgets
     CoreAddons
     Crash
-    #GlobalAccel
     I18n
     KIO
     Service
-    #Init
     Notifications
     Service
     WidgetsAddons
@@ -62,33 +60,23 @@ find_package(KF6 ${KF_MIN_VERSION} REQUIRED COMPONENTS
     
 )
 
+find_package(KF6Svg REQUIRED)
+find_package(KF6WindowSystem REQUIRED)
+find_package(epoxy REQUIRED)
+
+find_package(KDecoration3 REQUIRED)
+
+find_package(KWin REQUIRED COMPONENTS
+    kwineffects
+)
+find_package(KWinDBusInterface CONFIG REQUIRED)
+
 find_package(WaylandProtocols 1.48)
 set_package_properties(WaylandProtocols PROPERTIES
     TYPE REQUIRED
     PURPOSE "Collection of Wayland protocols that add functionality not available in the Wayland core protocol"
     URL "https://gitlab.freedesktop.org/wayland/wayland-protocols/"
 )
-
-find_package(KF6Svg REQUIRED)
-find_package(KF6WindowSystem REQUIRED)
-find_package(epoxy REQUIRED)
-
-find_package(X11 REQUIRED)
-find_package(XCB REQUIRED COMPONENTS XCB)
-
-if (KWIN_BUILD_WAYLAND)
-    find_package(KWin REQUIRED COMPONENTS
-        kwineffects
-    )
-else()
-    find_package(KWinX11 REQUIRED COMPONENTS
-        kwineffects
-    )
-endif()
-
-find_package(KDecoration3 REQUIRED)
-
-find_package(KWinDBusInterface CONFIG REQUIRED)
 
 add_subdirectory(src)
 

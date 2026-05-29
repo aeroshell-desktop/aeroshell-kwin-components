@@ -97,7 +97,6 @@
         "Name[x-test]": "xxStartup Feedbackxx",
         "Name[zh_CN]": "程序启动动效",
         "Name[zh_TW]": "啟動回饋",
-        "Id":"launchfeedback"
     },
     "org.kde.kwin.effect": {
         "internal": false

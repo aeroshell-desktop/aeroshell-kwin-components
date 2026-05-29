@@ -1,4 +1,3 @@
-
 if(KWIN_BUILD_WAYLAND)
     add_subdirectory(wayland)
 else()
