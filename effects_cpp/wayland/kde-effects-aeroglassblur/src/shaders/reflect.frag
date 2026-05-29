@@ -1,3 +1,5 @@
+#version 140
+
 uniform sampler2D texUnit;
 uniform float opacity;
 uniform float translate;
@@ -7,13 +9,16 @@ uniform mat4 colorMatrix;
 uniform vec2 windowPos;
 
 // Glow
+uniform bool useWayland;
 uniform vec2 textureSize;
 uniform bool scaleY;
 uniform sampler2D glowTexture;
 uniform bool glowEnable;
 uniform float glowOpacity;
 
-varying vec2 uv;
+in vec2 uv;
+
+out vec4 fragColor;
 
 vec4 glowFragment()
 {
@@ -43,15 +48,17 @@ void main(void)
     float y = (gl_FragCoord.y) / screenResolution.y;
 
     vec2 uv;
-    uv = vec2(x, y);
+    if(useWayland) {
+        uv = vec2(x, y);
+    } else {
+        uv = vec2(x, -y);
+    }
 
-    vec4 result = vec4(texture2D(texUnit, uv).rgba) * opacity;
-
-    if(glowEnable)
-    {
+    vec4 result = vec4(texture(texUnit, uv).rgba) * opacity;
+    if (glowEnable) {
         result += glowFragment();
     }
 
-    gl_FragColor = result;
-    gl_FragColor *= colorMatrix;
+    fragColor = result;
+    fragColor *= colorMatrix;
 }

@@ -7,19 +7,12 @@
 
 #pragma once
 
-#include "effect/effect.h"
-#include "opengl/glutils.h"
-#include "window.h"
+#include <effect/effect.h>
+#include <opengl/glutils.h>
+#include <scene/item.h>
 
 #include <QList>
-#include <QFile>
 #include <QSharedMemory>
-#include <QDir>
-#include <KSvg/FrameSvg>
-#include <QDBusConnection>
-#include <QDBusMessage>
-#include <KConfigWatcher>
-#include <KSharedConfig>
 
 #include <unordered_map>
 
@@ -39,10 +32,10 @@ struct BlurRenderData
 struct BlurEffectData
 {
     /// The region that should be blurred behind the window
-    std::optional<Region> content;
+    std::optional<RegionF> content;
 
     /// The region that should be blurred behind the frame
-    std::optional<Region> frame;
+    std::optional<RegionF> frame;
 
     /**
      * The render data per render view, as they can have different
@@ -68,10 +61,9 @@ public:
     void prePaintScreen(ScreenPrePaintData &data) override;
     void prePaintWindow(RenderView *view, EffectWindow *w, WindowPrePaintData &data) override;
     void drawWindow(const RenderTarget &renderTarget, const RenderViewport &viewport, EffectWindow *w, int mask, const Region &deviceRegion, WindowPaintData &data) override;
-    QMatrix4x4 colorMatrix(const float &brightness, const float &saturation) const;
 
-    //FF stuff
-    Region applyBlurRegion(KWin::EffectWindow *w, bool useFrame = false);
+    // FF stuff
+    RegionF applyBlurRegion(KWin::EffectWindow *w, bool useFrame = false);
     bool isFirefoxWindowValid(KWin::EffectWindow *w);
 
     bool provides(Feature feature) override;
@@ -90,7 +82,6 @@ public Q_SLOTS:
     void slotWindowAdded(KWin::EffectWindow *w);
     void slotWindowDeleted(KWin::EffectWindow *w);
     void slotViewRemoved(KWin::RenderView *view);
-    //void slotPropertyNotify(KWin::EffectWindow *w, long atom);
     void setupDecorationConnections(EffectWindow *w);
 
     void slotWindowMaximizedStateChanged(KWin::EffectWindow *w, bool horizontal, bool vertical);
@@ -98,8 +89,8 @@ public Q_SLOTS:
 
 private:
     void initBlurStrengthValues();
-    Region blurRegion(EffectWindow *w, bool noRoundedCorners = false);
-    Region decorationBlurRegion(const EffectWindow *w) const;
+    RegionF blurRegion(EffectWindow *w) const;
+    RegionF decorationBlurRegion(const EffectWindow *w) const;
     bool decorationSupportsBlurBehind(const EffectWindow *w) const;
     bool shouldBlur(const EffectWindow *w, int mask, const WindowPaintData &data) const;
     bool shouldForceBlur(const EffectWindow *w) const;
@@ -181,9 +172,6 @@ private:
     };
 
     bool m_valid = false;
-    long net_wm_blur_region = 0;
-    Region m_paintedDeviceArea; // keeps track of all painted areas (from bottom to top)
-    Region m_currentDeviceBlur; // keeps track of the currently blured area of the windows(from bottom to top)
     RenderView *m_currentView = nullptr;
 
     size_t m_iterationCount; // number of times the texture will be downsized to half size
@@ -262,7 +250,6 @@ private:
     std::list<EffectWindow*> m_maximizedWindows;
 
     QSharedMemory m_sharedMemory;
-
 };
 
 inline bool BlurEffect::provides(Effect::Feature feature)

@@ -1,9 +1,11 @@
+#version 140
 uniform sampler2D texUnit;
 uniform float offset;
 uniform vec2 halfpixel;
-uniform mat4 colorMatrix;
 
-varying vec2 uv;
+in vec2 uv;
+
+out vec4 fragColor;
 
 void main(void)
 {
@@ -13,5 +15,5 @@ void main(void)
     sum += texture2D(texUnit, uv + vec2(halfpixel.x, -halfpixel.y) * offset);
     sum += texture2D(texUnit, uv - vec2(halfpixel.x, -halfpixel.y) * offset);
 
-    gl_FragColor = sum / 8.0;
+    fragColor = sum / 8.0;
 }

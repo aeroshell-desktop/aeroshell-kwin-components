@@ -3,7 +3,6 @@
 uniform sampler2D texUnit;
 uniform float offset;
 uniform vec2 halfpixel;
-uniform mat4 colorMatrix;
 
 uniform float aeroColorR;
 uniform float aeroColorG;
@@ -13,20 +12,22 @@ uniform float aeroColorBalance;
 uniform float aeroAfterglowBalance;
 uniform float aeroBlurBalance;
 
-varying vec2 uv;
+uniform mat4 colorMatrix;
+
+in vec2 uv;
 
 out vec4 fragColor;
 
 void main(void)
 {
-    vec4 sum = texture2D(texUnit, uv + vec2(-halfpixel.x * 2.0, 0.0) * offset);
-    sum += texture2D(texUnit, uv + vec2(-halfpixel.x, halfpixel.y) * offset) * 2.0;
-    sum += texture2D(texUnit, uv + vec2(0.0, halfpixel.y * 2.0) * offset);
-    sum += texture2D(texUnit, uv + vec2(halfpixel.x, halfpixel.y) * offset) * 2.0;
-    sum += texture2D(texUnit, uv + vec2(halfpixel.x * 2.0, 0.0) * offset);
-    sum += texture2D(texUnit, uv + vec2(halfpixel.x, -halfpixel.y) * offset) * 2.0;
-    sum += texture2D(texUnit, uv + vec2(0.0, -halfpixel.y * 2.0) * offset);
-    sum += texture2D(texUnit, uv + vec2(-halfpixel.x, -halfpixel.y) * offset) * 2.0;
+    vec4 sum = texture(texUnit, uv + vec2(-halfpixel.x * 2.0, 0.0) * offset);
+    sum += texture(texUnit, uv + vec2(-halfpixel.x, halfpixel.y) * offset) * 2.0;
+    sum += texture(texUnit, uv + vec2(0.0, halfpixel.y * 2.0) * offset);
+    sum += texture(texUnit, uv + vec2(halfpixel.x, halfpixel.y) * offset) * 2.0;
+    sum += texture(texUnit, uv + vec2(halfpixel.x * 2.0, 0.0) * offset);
+    sum += texture(texUnit, uv + vec2(halfpixel.x, -halfpixel.y) * offset) * 2.0;
+    sum += texture(texUnit, uv + vec2(0.0, -halfpixel.y * 2.0) * offset);
+    sum += texture(texUnit, uv + vec2(-halfpixel.x, -halfpixel.y) * offset) * 2.0;
 
     sum /= 12.0;
     vec4 color = vec4(aeroColorR, aeroColorG, aeroColorB, aeroColorA);
@@ -38,4 +39,5 @@ void main(void)
     vec3 blurLayer      = sum.xyz * aeroBlurBalance;
 
     fragColor = vec4(primaryLayer + secondaryLayer + blurLayer, 1.0);
+
 }
