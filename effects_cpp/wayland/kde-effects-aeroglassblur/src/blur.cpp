@@ -448,6 +448,30 @@ void BlurEffect::updateBlurRegion(EffectWindow *w)
         frame = decorationBlurRegion(w);
     }
 
+    if (!shouldNotBlur(w)) {
+        // https://github.com/taj-ny/kwin-effects-forceblur/pull/128/files
+        const auto isX11WithCSD = effects->xcbConnection() && (w->frameGeometry() != w->bufferGeometry());
+        if (shouldForceBlur(w) && !(w->isTooltip())) {
+            if (!isX11WithCSD) {
+                content = w->expandedGeometry().translated(-w->x(), -w->y());
+            }
+
+            if (isX11WithCSD || w->decoration()) {
+                frame = w->frameGeometry().translated(-w->x(), -w->y());
+            }
+        }
+
+        if (isFirefoxWindowValid(w)) {
+            if (!(content.has_value() || frame.has_value())) {
+                if (isX11WithCSD) {
+                    frame = applyBlurRegion(w, true);
+                } else {
+                    content = applyBlurRegion(w);
+                }
+            }
+        }
+    }
+
     if (content.has_value() || frame.has_value()) {
         BlurEffectData &data = m_windows[w];
         data.content = content;
@@ -708,7 +732,7 @@ bool BlurEffect::shouldForceBlur(const EffectWindow *w) const
     }
 
     // Is it a Gadget window
-    bool matches = (w->window()->resourceName() == "plasmashell" || w->window()->resourceClass() == "plasmashell") && w->caption() == "plasmashell_explorer";
+    bool matches = (w->window()->resourceName() == "plasmashell" || w->window()->resourceClass() == "org.kde.plasmashell") && w->caption() == "plasmashell_explorer";
     if (matches) {
         return true;
     }
