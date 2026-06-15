@@ -15,7 +15,7 @@
 #include "cursorsource.h"
 #include "scene/cursoritem.h"
 #include "scene/scene.h"
-#include "scene/texture.h"
+#include "scene/imageitem.h"
 #include "scene/itemrenderer.h"
 #include "scene/workspacescene.h"
 
@@ -42,8 +42,7 @@ public:
     void refresh();
 
 private:
-
-    std::unique_ptr<Texture> m_imageTexture;
+    std::unique_ptr<ImageItem> m_imageItem;
     std::unique_ptr<ShapeCursorSource> m_source;
 };
 
@@ -111,9 +110,6 @@ private:
     void toggleBusyCursor();
 
     qreal m_bounceSizesRatio;
-#if KWIN_BUILD_X11
-    KStartupInfo *m_startupInfo;
-#endif
     QString m_currentStartup;
     QMap<QString, Startup> m_startups;
     bool m_active;
