@@ -3,25 +3,60 @@ project(aeroshell-kwin-components)
 
 set(PROJECT_VERSION "6.7.0")
 set(PROJECT_VERSION_MAJOR 6)
+set(KF6_MIN_VERSION "6.0.0")
+
 option(KWIN_INSTALL_MISC "Install miscellaneous components" ON)
 option(KWIN_BUILD_WAYLAND "Build with Wayland support" OFF)
-set(KF6_MIN_VERSION "6.0.0")
 
 find_package(ECM ${KF6_MIN_VERSION} REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 
 include(ECMQtDeclareLoggingCategory)
-
+include(FeatureSummary)
 include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings NO_POLICY_SCOPE)
-include(FeatureSummary)
 
-find_package(Qt6 REQUIRED COMPONENTS
-    Core Qml Quick DBus
+find_package(Qt6 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS
+    Gui Quick Widgets Core
+    DBus UiTools Widgets OpenGL
+    Network Xml WaylandClientPrivate WaylandClient
 )
-find_package(KF6 REQUIRED COMPONENTS
-    Config
+
+include_directories(${Qt6Widgets_INCLUDE_DIRS} ${Qt6Network_INCLUDE_DIRS} ${Qt6OpenGL_INCLUDE_DIRS} ${Qt6Xml_INCLUDE_DIRS})
+add_definitions(${Qt6Widgets_DEFINITIONS})
+
+find_package(KF6 ${KF_MIN_VERSION} REQUIRED COMPONENTS
+    Config ConfigWidgets CoreAddons Crash
+    I18n KIO Service Notifications
+    WidgetsAddons WindowSystem GuiAddons KCMUtils
+    Svg
+)
+
+find_package(KDecoration3 REQUIRED)
+
+if(KWIN_BUILD_WAYLAND)
+    find_package(KWin REQUIRED COMPONENTS
+        kwineffects
+    )
+else()
+    find_package(X11 REQUIRED)
+    find_package(XCB REQUIRED COMPONENTS XCB)
+
+    find_package(KWinX11 REQUIRED COMPONENTS
+        kwineffects
+    )
+endif()
+
+
+find_package(KWinDBusInterface CONFIG REQUIRED)
+
+find_package(epoxy REQUIRED)
+find_package(WaylandProtocols 1.48)
+set_package_properties(WaylandProtocols PROPERTIES
+    TYPE REQUIRED
+    PURPOSE "Collection of Wayland protocols that add functionality not available in the Wayland core protocol"
+    URL "https://gitlab.freedesktop.org/wayland/wayland-protocols/"
 )
 
 find_package(Vulkan REQUIRED)
@@ -29,9 +64,6 @@ find_package(Vulkan REQUIRED)
 remove_definitions(-DQT_NO_CAST_FROM_ASCII)
 add_subdirectory(effects_cpp)
 
-find_package(KF6 REQUIRED COMPONENTS
-    I18n
-)
 if(KWIN_INSTALL_MISC)
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/smod/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/smod)
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/kwin/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/kwin)
@@ -41,5 +73,7 @@ if(KWIN_INSTALL_MISC)
 else()
     message(STATUS "Skipping other KWin components")
 endif()
+
+feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
 
 install()
