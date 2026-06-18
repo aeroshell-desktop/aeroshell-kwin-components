@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
 project(aeroshell-kwin-components)
 
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 set(PROJECT_VERSION "6.7.0")
 set(PROJECT_VERSION_MAJOR 6)
 set(KF6_MIN_VERSION "6.0.0")
