@@ -162,7 +162,7 @@ KWin.TabBoxSwitcher {
 
                         property bool isShowDesktop: {
                             //console.log(index === mainItem.count-1 && !canClose && model.icon.toString().includes("user-desktop"))
-                            return index === dialogMainItem.count-1 && !canClose && model.icon.toString().includes("user-desktop")
+                            return index === dialogMainItem.count-1 && !model.closeable
                         }
 
                         MouseArea {
