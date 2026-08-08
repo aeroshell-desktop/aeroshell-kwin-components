@@ -157,6 +157,7 @@ BlurEffect::BlurEffect()
         m_reflectPass.screenResolutionLocation = m_reflectPass.shader->uniformLocation("screenResolution");
         m_reflectPass.windowPosLocation = m_reflectPass.shader->uniformLocation("windowPos");
         m_reflectPass.windowSizeLocation = m_reflectPass.shader->uniformLocation("windowSize");
+        m_reflectPass.windowScaleLocation = m_reflectPass.shader->uniformLocation("windowScale");
         m_reflectPass.translateTextureLocation = m_reflectPass.shader->uniformLocation("translate");
         m_reflectPass.colorMatrixLocation = m_reflectPass.shader->uniformLocation("colorMatrix");
         m_reflectPass.reflectTextureLocation = m_reflectPass.shader->uniformLocation("texUnit");
@@ -1002,9 +1003,13 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
 
         if (!winData.isNull()) // If the window sends transformation data, apply it to the painted geometry, skipping the offscreen geometry
         {
+            const qreal transformScale = viewport.scale() > 0.0 ? viewport.scale() : 1.0;
+
             for (int ind = 6; ind < 6+vertexCount; ind++) {
                 // Apply transformation to the triangle vertex
-                QPointF transformed = transformedMatrix.map(QPointF(map[ind].position.x(), map[ind].position.y()));
+                const QPointF logicalPos(map[ind].position.x() / transformScale, map[ind].position.y() / transformScale);
+                QPointF transformed = transformedMatrix.map(logicalPos) * transformScale;
+                //QPointF transformed = transformedMatrix.map(QPointF(map[ind].position.x(), map[ind].position.y()));
                 // Calculate new uv coordinates so the sampling doesn't get distorted
                 float u = transformed.x() / scaledBackgroundRect.width();
                 float v = 1.0f - transformed.y() / scaledBackgroundRect.height();
@@ -1197,6 +1202,7 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
             m_reflectPass.shader->setUniform(m_reflectPass.screenResolutionLocation, QVector2D(screenSize.width() * scale, screenSize.height() * scale));
             m_reflectPass.shader->setUniform(m_reflectPass.windowPosLocation, QVector2D(scaledBackgroundRect.x(), scaledBackgroundRect.y()));
             m_reflectPass.shader->setUniform(m_reflectPass.windowSizeLocation, QVector2D(backgroundRect.width(), backgroundRect.height()));
+            m_reflectPass.shader->setUniform(m_reflectPass.windowScaleLocation, float(scale));
             m_reflectPass.shader->setUniform(m_reflectPass.opacityLocation, float(finalOpacity));
             m_reflectPass.shader->setUniform(m_reflectPass.translateTextureLocation, m_translateTexture ? float(1.0) : float(0.0));
             m_reflectPass.shader->setUniform(m_reflectPass.colorMatrixLocation, colorMatrix);

@@ -15,6 +15,7 @@ uniform bool scaleY;
 uniform sampler2D glowTexture;
 uniform bool glowEnable;
 uniform float glowOpacity;
+uniform float windowScale;
 
 in vec2 uv;
 
@@ -22,7 +23,7 @@ out vec4 fragColor;
 
 vec4 glowFragment()
 {
-    float xpos = clamp((gl_FragCoord.x - windowPos.x) / windowSize.x, 0, 1);
+    float xpos = clamp(uv.x, 0.0, 1.0);
 
     float t_x = uv.x;
     if(xpos > 0.5) t_x = 1 - uv.x;
@@ -40,7 +41,7 @@ vec4 glowFragment()
 void main(void)
 {
 
-    float middleLine = windowPos.x + windowSize.x / 2.0;
+    float middleLine = windowPos.x + (windowSize.x * windowScale) / 2.0;
     float middleScreenLine = screenResolution.x / 2.0;
     float dx = translate * (middleScreenLine - middleLine) / 10.0;
 

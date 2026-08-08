@@ -117,6 +117,7 @@ private:
         int screenResolutionLocation;
         int windowPosLocation;
         int windowSizeLocation;
+        int windowScaleLocation;
         int opacityLocation;
         int translateTextureLocation;
         int reflectTextureLocation;
