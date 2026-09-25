@@ -132,6 +132,7 @@ BlurEffect::BlurEffect()
             m_aeroPasses[i].mvpMatrixLocation            = m_aeroPasses[i].shader->uniformLocation("modelViewProjectionMatrix");
             m_aeroPasses[i].offsetLocation               = m_aeroPasses[i].shader->uniformLocation("offset");
             m_aeroPasses[i].halfpixelLocation            = m_aeroPasses[i].shader->uniformLocation("halfpixel");
+            m_aeroPasses[i].transformedLocation          = m_aeroPasses[i].shader->uniformLocation("transformed");
             m_aeroPasses[i].colorMatrixLocation          = m_aeroPasses[i].shader->uniformLocation("colorMatrix");
             m_aeroPasses[i].aeroColorRLocation           = m_aeroPasses[i].shader->uniformLocation("aeroColorR");
             m_aeroPasses[i].aeroColorGLocation           = m_aeroPasses[i].shader->uniformLocation("aeroColorG");
@@ -809,6 +810,9 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
         transformedMatrix = winData.value<QMatrix4x4>();
     }
 
+    const bool scaled = !qFuzzyCompare(data.xScale(), 1.0) && !qFuzzyCompare(data.yScale(), 1.0);
+    bool regularTransformation = winData.isNull() && (mask & Effect::PAINT_WINDOW_TRANSFORMED);
+
     // Compute the effective blur shape. Note that if the window is transformed, so will be the blur shape.
     RegionF blurShape = blurRegion(w);
     if (data.xScale() != 1 || data.yScale() != 1) {
@@ -1092,6 +1096,11 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
         /*********************
          * COLORIZATION PASS *
          *********************/
+
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         float basicAlpha = m_aeroIntensity / 255.0f;
 
         float pb = m_aeroPrimaryBalance;
@@ -1128,7 +1137,7 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
             selectedPass = AeroPasses::BASIC;
         }
 
-        if (!useTransparency) {
+        if (!useTransparency || (regularTransformation && !opaqueMaximize)) {
             selectedPass = AeroPasses::OPAQUE;
         }
 
@@ -1145,6 +1154,7 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
                                   0.5 / (double)read->colorAttachment()->height());
         m_aeroPasses[selectedPass].shader->setUniform(m_aeroPasses[selectedPass].mvpMatrixLocation, projectionMatrix);
         m_aeroPasses[selectedPass].shader->setUniform(m_aeroPasses[selectedPass].halfpixelLocation, halfpixel);
+        m_aeroPasses[selectedPass].shader->setUniform(m_aeroPasses[selectedPass].transformedLocation, ((regularTransformation && useTransparency) ? basicAlpha : 1.0));
         m_aeroPasses[selectedPass].shader->setUniform(m_aeroPasses[selectedPass].offsetLocation, float(m_offset / 2.5f));
         m_aeroPasses[selectedPass].shader->setUniform(m_aeroPasses[selectedPass].colorMatrixLocation, colorMatrix);
 
@@ -1171,6 +1181,7 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
         }
 
         ShaderManager::instance()->popShader();
+        glDisable(GL_BLEND);
     }
 
     // Reflection and corner shines
