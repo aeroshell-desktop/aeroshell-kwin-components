@@ -3,6 +3,7 @@
 uniform sampler2D texUnit;
 uniform float offset;
 uniform vec2 halfpixel;
+uniform float transformed;
 
 uniform float aeroColorR;
 uniform float aeroColorG;

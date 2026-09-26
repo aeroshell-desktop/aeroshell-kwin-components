@@ -3,6 +3,7 @@
 uniform sampler2D texUnit;
 uniform float offset;
 uniform vec2 halfpixel;
+uniform float transformed;
 
 uniform float aeroColorR;
 uniform float aeroColorG;
@@ -22,8 +23,12 @@ void main(void)
 {
     vec4 color = vec4(aeroColorR, aeroColorG, aeroColorB, aeroColorA);
     vec4 baseColor = vec4(0.871, 0.871, 0.871, 1.0 - aeroColorA);
-    fragColor = vec4(color.r * color.a + baseColor.r * baseColor.a,
-                     color.g * color.a + baseColor.g * baseColor.a,
-                     color.b * color.a + baseColor.b * baseColor.a, 1.0);
+    if(transformed != 1.0) {
+        fragColor = vec4(color.r, color.g, color.b, transformed);
+    } else {
+        fragColor = vec4(color.r * color.a + baseColor.r * baseColor.a,
+                        color.g * color.a + baseColor.g * baseColor.a,
+                        color.b * color.a + baseColor.b * baseColor.a, transformed);
+    }
     fragColor *= colorMatrix;
 }

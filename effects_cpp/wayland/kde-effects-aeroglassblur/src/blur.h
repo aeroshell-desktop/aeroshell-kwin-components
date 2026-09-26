@@ -158,6 +158,7 @@ private:
         int colorMatrixLocation;
         int offsetLocation;
         int halfpixelLocation;
+        int transformedLocation;
 
         int aeroColorRLocation;
         int aeroColorGLocation;
