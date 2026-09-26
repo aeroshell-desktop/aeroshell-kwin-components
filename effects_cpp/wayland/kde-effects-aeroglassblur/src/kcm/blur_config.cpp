@@ -18,6 +18,7 @@
 #include <iostream>
 #include <QJsonDocument>
 #include <QTimer>
+#include <QTime>
 #include <QWindow>
 
 namespace KWin
@@ -37,7 +38,7 @@ BlurEffectConfig::BlurEffectConfig(QObject *parent, const KPluginMetaData &data)
 	ui.invisibleWidgets->setVisible(false);
 	ui.debugValues->setVisible(false);
     ui.kcfg_BlurMatching->setVisible(false);
-	
+
 	m_dialog = new QFileDialog();
 	m_dialog->setFileMode(QFileDialog::ExistingFile);
 	m_dialog->setNameFilter("PNG files (*.png)");

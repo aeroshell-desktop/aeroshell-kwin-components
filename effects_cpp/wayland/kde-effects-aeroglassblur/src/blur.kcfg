@@ -94,5 +94,14 @@
     <entry name="ExcludedColorization" type="String">
         <default></default>
 	</entry>
+    <entry name="ReflectionFollowsSun" type="Bool">
+        <default>false</default>
+    </entry>
+    <entry name="SunriseTime" type="Time">
+        <default>06:00:00</default>
+    </entry>
+    <entry name="SunsetTime" type="Time">
+        <default>18:00:00</default>
+    </entry>
     </group>
 </kcfg>

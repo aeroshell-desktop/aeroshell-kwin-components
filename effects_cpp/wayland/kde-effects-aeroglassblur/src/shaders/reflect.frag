@@ -7,6 +7,7 @@ uniform vec2 screenResolution;
 uniform vec2 windowSize;
 uniform mat4 colorMatrix;
 uniform vec2 windowPos;
+uniform float shearingAmount;
 
 // Glow
 uniform bool useWayland;
@@ -55,7 +56,10 @@ void main(void)
         uv = vec2(x, -y);
     }
 
-    vec4 result = vec4(texture(texUnit, uv).rgba) * opacity;
+    vec2 shearedUv = uv;
+    shearedUv.x += uv.y * -shearingAmount;
+
+    vec4 result = vec4(texture(texUnit, shearedUv).rgba) * opacity;
     if (glowEnable) {
         result += glowFragment();
     }

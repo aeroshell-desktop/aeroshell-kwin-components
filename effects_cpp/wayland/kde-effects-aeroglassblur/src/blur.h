@@ -13,6 +13,7 @@
 
 #include <QList>
 #include <QSharedMemory>
+#include <QTimer>
 
 #include <unordered_map>
 
@@ -88,6 +89,7 @@ public Q_SLOTS:
     void slotMinimizedChanged(KWin::EffectWindow *w);
 
 private:
+    void updateTime();
     void initBlurStrengthValues();
     RegionF blurRegion(EffectWindow *w) const;
     RegionF decorationBlurRegion(const EffectWindow *w) const;
@@ -121,6 +123,7 @@ private:
         int opacityLocation;
         int translateTextureLocation;
         int reflectTextureLocation;
+        int shearingAmountLocation;
 
         // Glow
         int glowTextureLocation;
@@ -251,6 +254,16 @@ private:
     std::list<EffectWindow*> m_maximizedWindows;
 
     QSharedMemory m_sharedMemory;
+
+    QTimer m_repaintTimer;
+
+    bool m_reflectionFollowsSun;
+    QTime m_sunGoesUp;
+    QTime m_sunGoesDown;
+    QTime m_endOfDay;
+
+    qreal m_dayOpacity;
+    qreal m_shearingAmount;
 };
 
 inline bool BlurEffect::provides(Effect::Feature feature)

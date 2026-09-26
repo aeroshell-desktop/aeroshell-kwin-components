@@ -92,6 +92,10 @@ static QMatrix4x4 colorTransformMatrix(qreal saturation, qreal brightness)
 
 BlurEffect::BlurEffect()
     : m_sharedMemory("kwinaero")
+    , m_reflectionFollowsSun(false)
+    , m_endOfDay(23, 59, 59)
+    , m_dayOpacity(1.0)
+    , m_shearingAmount(0.0)
 {
     BlurConfig::instance(effects->config());
     ensureResources();
@@ -167,6 +171,7 @@ BlurEffect::BlurEffect()
         m_reflectPass.glowTextureLocation = m_reflectPass.shader->uniformLocation("glowTexture");
         m_reflectPass.glowEnableLocation = m_reflectPass.shader->uniformLocation("glowEnable");
         m_reflectPass.glowOpacityLocation = m_reflectPass.shader->uniformLocation("glowOpacity");
+        m_reflectPass.shearingAmountLocation = m_reflectPass.shader->uniformLocation("shearingAmount");
 
     }
 
@@ -198,6 +203,27 @@ BlurEffect::BlurEffect()
 BlurEffect::~BlurEffect()
 {
     waylandServer()->backgroundEffectManager()->removeBlurCapability();
+}
+
+void BlurEffect::updateTime()
+{
+    static const qreal offset = 60000 * 30;
+
+    const int sunGoesUpTime = m_sunGoesUp.msecsSinceStartOfDay();
+    const int sunGoesDownTime = m_sunGoesDown.msecsSinceStartOfDay();
+    const int currentTime = QTime::currentTime().msecsSinceStartOfDay();
+
+    m_dayOpacity = (qreal)qMax(0, currentTime - sunGoesUpTime) / (((qreal)sunGoesUpTime + offset) - (qreal)sunGoesUpTime);
+    if (m_dayOpacity > 1) {
+        m_dayOpacity = 1;
+    }
+
+    m_dayOpacity -= (qreal)qMax(0, currentTime - sunGoesDownTime) / (((qreal)sunGoesDownTime + offset) - (qreal)sunGoesDownTime);
+    if (m_dayOpacity < 0) {
+        m_dayOpacity = 0;
+    }
+
+    m_shearingAmount = (qreal)currentTime / (qreal)m_endOfDay.msecsSinceStartOfDay();
 }
 
 void BlurEffect::initBlurStrengthValues()
@@ -291,6 +317,25 @@ bool BlurEffect::readMemory(bool *skipFunc)
 void BlurEffect::reconfigure(ReconfigureFlags flags)
 {
     Q_UNUSED(flags)
+
+    m_reflectionFollowsSun = BlurConfig::reflectionFollowsSun();
+    if (m_reflectionFollowsSun) {
+        m_sunGoesUp = BlurConfig::sunriseTime();
+        m_sunGoesDown = BlurConfig::sunsetTime();
+
+        m_repaintTimer.setInterval(60000);
+        connect(&m_repaintTimer, &QTimer::timeout, this, [&] {
+            updateTime();
+            effects->addRepaintFull();
+            m_repaintTimer.start();
+        });
+        m_repaintTimer.start();
+
+        updateTime();
+    } else {
+        m_repaintTimer.stop();
+        m_shearingAmount = 0.0;
+    }
 
     auto configureAero = [&]() {
         float fR = 0, fG = 0, fB = 0, fH = 0, fS = 0, fV = 0;
@@ -1187,6 +1232,10 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
             }
         }
 
+        if (m_reflectionFollowsSun) {
+            finalOpacity *= m_dayOpacity;
+        }
+
         QSize screenSize = KWin::effects->virtualScreenSize();
         GLTexture *reflectTex = m_reflectPass.reflectTexture.get();
         GLTexture *glowTex = !treatAsActive(w) ? m_reflectPass.sideGlowTexture_unfocus.get() : m_reflectPass.sideGlowTexture.get();
@@ -1196,6 +1245,7 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
 
             QMatrix4x4 projectionMatrix = viewport.projectionMatrix();
             projectionMatrix.translate(scaledBackgroundRect.x(), scaledBackgroundRect.y());
+
             const auto scale = viewport.scale();
 
             m_reflectPass.shader->setUniform(m_reflectPass.mvpMatrixLocation, projectionMatrix);
@@ -1206,6 +1256,7 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
             m_reflectPass.shader->setUniform(m_reflectPass.opacityLocation, float(finalOpacity));
             m_reflectPass.shader->setUniform(m_reflectPass.translateTextureLocation, m_translateTexture ? float(1.0) : float(0.0));
             m_reflectPass.shader->setUniform(m_reflectPass.colorMatrixLocation, colorMatrix);
+            m_reflectPass.shader->setUniform(m_reflectPass.shearingAmountLocation, m_shearingAmount);
 
             bool useWayland = effects->waylandDisplay() != nullptr; // Determine whether to flip the textures or not
             auto renderTexture = renderTarget.texture();

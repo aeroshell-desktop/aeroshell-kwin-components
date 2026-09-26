@@ -283,6 +283,7 @@ void MainWindow::on_windowActiveChanged()
 }
 void MainWindow::showEvent(QShowEvent *event)
 {
+  Q_UNUSED(event)
     if(this->windowHandle()) {
         KWindowEffects::enableBlurBehind(this->windowHandle(), true, QRegion(0,0, 0, 0));
         window_handle = this->windowHandle();
@@ -385,6 +386,7 @@ void MainWindow::changeCustomColor(bool apply) {
 
 // Toggles the visibility of the group box containing the color sliders.
 void MainWindow::on_colorMixerLabel_linkActivated(const QString &link) {
+  Q_UNUSED(link)
   ui->colorMixerGroupBox->setVisible(!ui->colorMixerGroupBox->isVisible());
   ui->colorMixerLabel->setText(ui->colorMixerGroupBox->isVisible()
                                    ? "<a style=\"color: #0066D4\" href=\"no\">" + i18n("Hide color mixer") + "</a>"
@@ -393,6 +395,7 @@ void MainWindow::on_colorMixerLabel_linkActivated(const QString &link) {
 
 // Updates the color sliders and updates the custom color.
 void MainWindow::on_hue_Slider_valueChanged(int value) {
+  Q_UNUSED(value)
   ui->hue_label->setText(QString::number(ui->hue_Slider->value()));
   saturation_gradient =
       "qlineargradient(x1: 0, y1: 1, x2: 1, y2: 1, stop: 0 #FFFFFF, stop: 1 " +
@@ -412,17 +415,20 @@ void MainWindow::on_hue_Slider_valueChanged(int value) {
 void MainWindow::on_pushButton_3_clicked() { this->close(); }
 
 void MainWindow::on_saturation_Slider_valueChanged(int value) {
+  Q_UNUSED(value)
   ui->saturation_label->setText(
       QString::number(ui->saturation_Slider->value()));
   changeCustomColor();
 }
 
 void MainWindow::on_Lightness_Slider_valueChanged(int value) {
+  Q_UNUSED(value)
   ui->brightness_label->setText(QString::number(ui->Lightness_Slider->value()));
   changeCustomColor();
 }
 
 void MainWindow::on_alpha_slider_valueChanged(int value) {
+  Q_UNUSED(value)
   ui->alpha_label->setText(QString::number(ui->alpha_slider->value()));
   changeCustomColor();
 }
@@ -467,6 +473,7 @@ void MainWindow::on_saveChanges_Button_clicked() {
 }
 
 void MainWindow::on_kcfg_EnableTransparency_stateChanged(int arg1) {
+  Q_UNUSED(arg1)
   if (!preventChanges)
     applyTemporarily();
 }
