@@ -330,7 +330,7 @@ void BlurEffect::reconfigure(ReconfigureFlags flags)
 
         m_minimumReflectionIntensity = BlurConfig::minimumReflectionIntensity();
 
-        m_repaintTimer.setInterval(1000);
+        m_repaintTimer.setInterval(30000);
         connect(&m_repaintTimer, &QTimer::timeout, this, [&] {
             updateTime();
             effects->addRepaintFull();
