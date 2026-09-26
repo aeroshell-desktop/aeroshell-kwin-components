@@ -32,6 +32,13 @@ BlurEffectConfig::BlurEffectConfig(QObject *parent, const KPluginMetaData &data)
     KLocalizedString::setApplicationDomain("aeroshell-kwin-components");
     ui.setupUi(widget());
     BlurConfig::instance("kwinrc");
+
+    connect(ui.kcfg_ReflectionFollowsSun, &QCheckBox::checkStateChanged, this, [&] (Qt::CheckState checkState) {
+        bool enabled = checkState == Qt::Checked;
+        ui.kcfg_SunriseTime->setEnabled(enabled);
+        ui.kcfg_SunsetTime->setEnabled(enabled);
+    });
+
     addConfig(BlurConfig::self(), widget());
     calculateDebugPrint();
 

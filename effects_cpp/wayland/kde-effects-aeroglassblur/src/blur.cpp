@@ -319,12 +319,14 @@ void BlurEffect::reconfigure(ReconfigureFlags flags)
 {
     Q_UNUSED(flags)
 
+    BlurConfig::self()->read();
+    qDebug() << "reconfiguring" << BlurConfig::reflectionFollowsSun();
     m_reflectionFollowsSun = BlurConfig::reflectionFollowsSun();
     if (m_reflectionFollowsSun) {
         m_sunGoesUp = BlurConfig::sunriseTime();
         m_sunGoesDown = BlurConfig::sunsetTime();
 
-        m_repaintTimer.setInterval(60000);
+        m_repaintTimer.setInterval(30000);
         connect(&m_repaintTimer, &QTimer::timeout, this, [&] {
             updateTime();
             effects->addRepaintFull();
@@ -336,6 +338,7 @@ void BlurEffect::reconfigure(ReconfigureFlags flags)
     } else {
         m_repaintTimer.stop();
         m_shearingAmount = 0.0;
+        effects->addRepaintFull();
     }
 
     auto configureAero = [&]() {
@@ -378,7 +381,6 @@ void BlurEffect::reconfigure(ReconfigureFlags flags)
         return;
     }
 
-    BlurConfig::self()->read();
     if(!readColor)
     {
         m_aeroIntensity  = BlurConfig::aeroIntensity();
