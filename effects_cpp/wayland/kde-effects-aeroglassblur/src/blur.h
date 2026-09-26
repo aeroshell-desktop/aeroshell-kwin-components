@@ -265,6 +265,7 @@ private:
 
     qreal m_dayOpacity;
     qreal m_shearingAmount;
+    int m_minimumReflectionIntensity;
 };
 
 inline bool BlurEffect::provides(Effect::Feature feature)

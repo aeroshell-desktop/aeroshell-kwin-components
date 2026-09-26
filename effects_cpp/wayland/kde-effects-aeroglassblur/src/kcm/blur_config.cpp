@@ -39,6 +39,10 @@ BlurEffectConfig::BlurEffectConfig(QObject *parent, const KPluginMetaData &data)
         ui.kcfg_SunsetTime->setEnabled(enabled);
     });
 
+    connect(ui.kcfg_ReflectionIntensity, SIGNAL(valueChanged(int)), this, SLOT(on_kcfg_ReflectionIntensity_valueChanged(int)));
+    connect(ui.kcfg_MinimumReflectionIntensity, SIGNAL(valueChanged(int)), this, SLOT(on_kcfg_MinimumReflectionIntensity_valueChanged(int)));
+    connect(ui.kcfg_FirefoxHollowRegion, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(on_kcfg_FirefoxHollowRegion_checkStateChanged(Qt::CheckState)));
+
     addConfig(BlurConfig::self(), widget());
     calculateDebugPrint();
 
@@ -53,11 +57,6 @@ BlurEffectConfig::BlurEffectConfig(QObject *parent, const KPluginMetaData &data)
 	connect(ui.browse_pushButton, SIGNAL(clicked()), this, SLOT(setTexturePath()));
     connect(ui.clear_pushButton, SIGNAL(clicked()), this, SLOT(clearTexturePath()));
 	connect(ui.showAccentColor_label, SIGNAL(linkActivated(QString)), this, SLOT(openColorMixer(QString)));
-    connect(ui.kcfg_ReflectionIntensity, SIGNAL(valueChanged(int)), this, SLOT(on_kcfg_ReflectionIntensity_valueChanged(int)));
-    connect(ui.kcfg_FirefoxHollowRegion, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(on_kcfg_FirefoxHollowRegion_checkStateChanged(Qt::CheckState)));
-
-    ui.reflectionLabel->setText(QString::number(ui.kcfg_ReflectionIntensity->value()) + " %" );
-    on_kcfg_FirefoxHollowRegion_checkStateChanged(ui.kcfg_FirefoxHollowRegion->checkState());
 
     /*
      * It turns out that System Settings, when loading a KCM plugin, doesn't actually
@@ -107,8 +106,15 @@ void BlurEffectConfig::on_kcfg_FirefoxHollowRegion_checkStateChanged(Qt::CheckSt
 }
 void BlurEffectConfig::on_kcfg_ReflectionIntensity_valueChanged(int value)
 {
+    Q_UNUSED(value)
     ui.reflectionLabel->setText(QString::number(ui.kcfg_ReflectionIntensity->value()) + " %" );
     //writeToMemory(ui.kcfg_AeroHue->value(), )
+}
+
+void BlurEffectConfig::on_kcfg_MinimumReflectionIntensity_valueChanged(int value)
+{
+    Q_UNUSED(value)
+    ui.minimumReflectionLabel->setText(QString::number(ui.kcfg_MinimumReflectionIntensity->value()) + " %" );
 }
 
 void BlurEffectConfig::writeToMemory(int h, int s, int v, int i, bool transparency, bool skip)

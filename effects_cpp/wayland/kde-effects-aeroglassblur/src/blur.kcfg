@@ -103,5 +103,8 @@
     <entry name="SunsetTime" type="Time">
         <default>18:00:00</default>
     </entry>
+    <entry name="MinimumReflectionIntensity" type="Int">
+        <default>0</default>
+    </entry>
     </group>
 </kcfg>

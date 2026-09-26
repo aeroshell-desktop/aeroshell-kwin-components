@@ -96,6 +96,7 @@ BlurEffect::BlurEffect()
     , m_endOfDay(23, 59, 59)
     , m_dayOpacity(1.0)
     , m_shearingAmount(0.0)
+    , m_minimumReflectionIntensity(0)
 {
     BlurConfig::instance(effects->config());
     ensureResources();
@@ -210,21 +211,23 @@ void BlurEffect::updateTime()
 {
     static const qreal offset = 60000 * 30;
 
-    const int sunGoesUpTime = m_sunGoesUp.msecsSinceStartOfDay();
-    const int sunGoesDownTime = m_sunGoesDown.msecsSinceStartOfDay();
-    const int currentTime = QTime::currentTime().msecsSinceStartOfDay();
+    const qreal sunGoesUpTime = m_sunGoesUp.msecsSinceStartOfDay();
+    const qreal sunGoesDownTime = m_sunGoesDown.msecsSinceStartOfDay();
+    const qreal currentTime = QTime::currentTime().msecsSinceStartOfDay();
+    const qreal endOfDayTime = m_endOfDay.msecsSinceStartOfDay();
 
-    m_dayOpacity = (qreal)qMax(0, currentTime - sunGoesUpTime) / (((qreal)sunGoesUpTime + offset) - (qreal)sunGoesUpTime);
+    m_dayOpacity = qMax(0.0, currentTime - sunGoesUpTime) / ((sunGoesUpTime + offset) - sunGoesUpTime);
     if (m_dayOpacity > 1) {
         m_dayOpacity = 1;
     }
 
-    m_dayOpacity -= (qreal)qMax(0, currentTime - sunGoesDownTime) / (((qreal)sunGoesDownTime + offset) - (qreal)sunGoesDownTime);
+    m_dayOpacity -= qMax(0.0, currentTime - sunGoesDownTime) / ((sunGoesDownTime + offset) - sunGoesDownTime);
     if (m_dayOpacity < 0) {
         m_dayOpacity = 0;
     }
 
-    m_shearingAmount = (qreal)currentTime / (qreal)m_endOfDay.msecsSinceStartOfDay();
+    // TODO: relearn how functions work and how to make them because this sucks
+    m_shearingAmount = (currentTime - qMax(0.0, currentTime - sunGoesDownTime) * ((sunGoesDownTime * ((sunGoesUpTime / sunGoesDownTime) + 1)) / sunGoesUpTime)) / endOfDayTime;
 }
 
 void BlurEffect::initBlurStrengthValues()
@@ -320,13 +323,14 @@ void BlurEffect::reconfigure(ReconfigureFlags flags)
     Q_UNUSED(flags)
 
     BlurConfig::self()->read();
-    qDebug() << "reconfiguring" << BlurConfig::reflectionFollowsSun();
     m_reflectionFollowsSun = BlurConfig::reflectionFollowsSun();
     if (m_reflectionFollowsSun) {
         m_sunGoesUp = BlurConfig::sunriseTime();
         m_sunGoesDown = BlurConfig::sunsetTime();
 
-        m_repaintTimer.setInterval(30000);
+        m_minimumReflectionIntensity = BlurConfig::minimumReflectionIntensity();
+
+        m_repaintTimer.setInterval(1000);
         connect(&m_repaintTimer, &QTimer::timeout, this, [&] {
             updateTime();
             effects->addRepaintFull();
@@ -338,6 +342,7 @@ void BlurEffect::reconfigure(ReconfigureFlags flags)
     } else {
         m_repaintTimer.stop();
         m_shearingAmount = 0.0;
+        m_minimumReflectionIntensity = 0;
         effects->addRepaintFull();
     }
 
@@ -1236,17 +1241,20 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-        float finalOpacity = (float)opacity * (float)m_reflectionIntensity / 100.0f;
+        qreal finalOpacity = (qreal)opacity * (qreal)m_reflectionIntensity / 100.0f;
+        qreal minimumOpacity = (qreal)opacity * (qreal)m_minimumReflectionIntensity / 100.0f;
         if (opaqueMaximize) {
             finalOpacity *= 0.6f;
+            minimumOpacity *= 0.6f;
 
             if (!treatAsActive(w)) {
                 finalOpacity *= 0.5f;
+                minimumOpacity *= 0.5f;
             }
         }
 
         if (m_reflectionFollowsSun) {
-            finalOpacity *= m_dayOpacity;
+            finalOpacity = qMax(minimumOpacity, finalOpacity * m_dayOpacity);
         }
 
         QSize screenSize = KWin::effects->virtualScreenSize();
@@ -1266,7 +1274,7 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
             m_reflectPass.shader->setUniform(m_reflectPass.windowPosLocation, QVector2D(scaledBackgroundRect.x(), scaledBackgroundRect.y()));
             m_reflectPass.shader->setUniform(m_reflectPass.windowSizeLocation, QVector2D(backgroundRect.width(), backgroundRect.height()));
             m_reflectPass.shader->setUniform(m_reflectPass.windowScaleLocation, float(scale));
-            m_reflectPass.shader->setUniform(m_reflectPass.opacityLocation, float(finalOpacity));
+            m_reflectPass.shader->setUniform(m_reflectPass.opacityLocation, finalOpacity);
             m_reflectPass.shader->setUniform(m_reflectPass.translateTextureLocation, m_translateTexture ? float(1.0) : float(0.0));
             m_reflectPass.shader->setUniform(m_reflectPass.colorMatrixLocation, colorMatrix);
             m_reflectPass.shader->setUniform(m_reflectPass.shearingAmountLocation, m_shearingAmount);
