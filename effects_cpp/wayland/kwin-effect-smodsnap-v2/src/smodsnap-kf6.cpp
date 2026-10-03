@@ -6,6 +6,8 @@
 
 #include "smodsnap.h"
 
+#include "core/rendertarget.h"
+
 #include <KConfig>
 #include <KConfigGroup>
 
@@ -40,7 +42,12 @@ void SmodSnapEffect::paintScreen(const RenderTarget &renderTarget, const RenderV
     if (anim1->m_active || anim2->m_active) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-        ShaderManager::instance()->pushShader(m_shader.get());
+
+        ShaderBinder binder(ShaderTrait::MapTexture | ShaderTrait::TransformColorspace);
+        binder.shader()->setColorspaceUniforms(ColorDescription::sRGB, renderTarget.colorDescription(), RenderingIntent::Perceptual);
+
+        const auto toXYZ = renderTarget.colorDescription()->containerColorimetry().toXYZ();
+        binder.shader()->setUniform(GLShader::Vec3Uniform::PrimaryBrightness, QVector3D(toXYZ(1, 0), toXYZ(1, 1), toXYZ(1, 2)));
 
         const auto scale = viewport.scale();
 
@@ -48,7 +55,7 @@ void SmodSnapEffect::paintScreen(const RenderTarget &renderTarget, const RenderV
             const QRectF pixelGeometry = snapToPixelGridF(anim1->m_rect.scaled(scale));
             QMatrix4x4 mvp = viewport.projectionMatrix();
             mvp.translate(anim1->m_rect.x() * scale, anim1->m_rect.y() * scale);
-            m_shader->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);
+            binder.shader()->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);
             GLTexture *texture = m_texture[anim1->m_frame].get();
             texture->render(pixelGeometry.size());
         }
@@ -57,12 +64,11 @@ void SmodSnapEffect::paintScreen(const RenderTarget &renderTarget, const RenderV
             const QRectF pixelGeometry = snapToPixelGridF(anim2->m_rect.scaled(scale));
             QMatrix4x4 mvp = viewport.projectionMatrix();
             mvp.translate(anim2->m_rect.x() * scale, anim2->m_rect.y() * scale);
-            m_shader->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);
+            binder.shader()->setUniform(GLShader::Mat4Uniform::ModelViewProjectionMatrix, mvp);
             GLTexture *texture = m_texture[anim2->m_frame].get();
             texture->render(pixelGeometry.size());
         }
 
-        ShaderManager::instance()->popShader();
         glDisable(GL_BLEND);
     }
 }
