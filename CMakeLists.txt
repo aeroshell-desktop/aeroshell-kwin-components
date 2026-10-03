@@ -5,12 +5,11 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(PROJECT_VERSION "6.7.5")
+set(PROJECT_VERSION "6.8.0")
 set(PROJECT_VERSION_MAJOR 6)
 set(KF6_MIN_VERSION "6.0.0")
 
 option(KWIN_INSTALL_MISC "Install miscellaneous components" ON)
-option(KWIN_BUILD_WAYLAND "Build with Wayland support" OFF)
 
 find_package(ECM ${KF6_MIN_VERSION} REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
@@ -39,24 +38,13 @@ find_package(KF6 ${KF_MIN_VERSION} REQUIRED COMPONENTS
 
 find_package(KDecoration3 REQUIRED)
 
-if(KWIN_BUILD_WAYLAND)
-    find_package(KWin REQUIRED COMPONENTS
-        kwineffects
-    )
-else()
-    find_package(X11 REQUIRED)
-    find_package(XCB REQUIRED COMPONENTS XCB)
-
-    find_package(KWinX11 REQUIRED COMPONENTS
-        kwineffects
-    )
-endif()
-
-
+ find_package(KWin REQUIRED COMPONENTS
+    kwineffects
+)
 find_package(KWinDBusInterface CONFIG REQUIRED)
 
 find_package(epoxy REQUIRED)
-find_package(WaylandProtocols 1.48)
+find_package(WaylandProtocols 1.48 REQUIRED)
 set_package_properties(WaylandProtocols PROPERTIES
     TYPE REQUIRED
     PURPOSE "Collection of Wayland protocols that add functionality not available in the Wayland core protocol"

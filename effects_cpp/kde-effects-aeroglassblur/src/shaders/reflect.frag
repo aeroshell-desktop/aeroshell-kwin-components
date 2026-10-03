@@ -26,13 +26,13 @@ vec4 glowFragment()
     float xpos = clamp(uv.x, 0.0, 1.0);
 
     float t_x = uv.x;
-    if(xpos > 0.5) t_x = 1 - uv.x;
+    if(xpos > 0.5) t_x = 1.0 - uv.x;
     else t_x = uv.x;
 
     float t_y = uv.y;
     if(scaleY) t_y = uv.y * windowSize.y;
     else t_y = uv.y;
-    vec2 t_uv = vec2(windowSize.x * t_x / textureSize.x, windowSize.y * (1 - t_y) / textureSize.y);
+    vec2 t_uv = vec2(windowSize.x * t_x / textureSize.x, windowSize.y * (1.0 - t_y) / textureSize.y);
 
     vec4 result = texture2D(glowTexture, t_uv) * glowOpacity;
     return result;
