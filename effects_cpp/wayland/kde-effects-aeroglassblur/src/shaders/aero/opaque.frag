@@ -1,5 +1,7 @@
 #version 140
 
+#include "aeroshell/brightnessadjust.frag"
+
 uniform sampler2D texUnit;
 uniform float offset;
 uniform vec2 halfpixel;
@@ -23,12 +25,13 @@ void main(void)
 {
     vec4 color = vec4(aeroColorR, aeroColorG, aeroColorB, aeroColorA);
     vec4 baseColor = vec4(0.871, 0.871, 0.871, 1.0 - aeroColorA);
+    vec4 result;
     if(transformed != 1.0) {
-        fragColor = vec4(color.r, color.g, color.b, transformed);
+        result = vec4(color.r, color.g, color.b, transformed);
     } else {
-        fragColor = vec4(color.r * color.a + baseColor.r * baseColor.a,
+        result = vec4(color.r * color.a + baseColor.r * baseColor.a,
                         color.g * color.a + baseColor.g * baseColor.a,
                         color.b * color.a + baseColor.b * baseColor.a, transformed);
     }
-    fragColor *= colorMatrix;
+    fragColor = adjustBrightness(result);
 }

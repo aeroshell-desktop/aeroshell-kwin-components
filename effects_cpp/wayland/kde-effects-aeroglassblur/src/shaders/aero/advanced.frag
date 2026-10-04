@@ -1,5 +1,7 @@
 #version 140
 
+#include "aeroshell/brightnessadjust.frag"
+
 uniform sampler2D texUnit;
 uniform float offset;
 uniform vec2 halfpixel;
@@ -32,13 +34,14 @@ void main(void)
 
     sum /= 12.0;
     vec4 color = vec4(aeroColorR, aeroColorG, aeroColorB, aeroColorA);
-    color *= colorMatrix;
+    //vec4 adjustedColor = color;
     vec3 primaryColor   = color.rgb;
     vec3 secondaryColor = color.rgb;
     vec3 primaryLayer   = primaryColor * aeroColorBalance; //pow(aeroColorBalance, 1.1);
     vec3 secondaryLayer = (secondaryColor * dot(sum.xyz, vec3(0.299, 0.587, 0.114))) * aeroAfterglowBalance;
     vec3 blurLayer      = sum.xyz * aeroBlurBalance;
 
-    fragColor = vec4(primaryLayer + secondaryLayer + blurLayer, 1.0);
+    vec4 result = vec4(primaryLayer + secondaryLayer + blurLayer, 1.0);
+    fragColor = adjustBrightness(result);
 
 }

@@ -1,5 +1,7 @@
 #version 140
 
+#include "aeroshell/brightnessadjust.frag"
+
 uniform sampler2D texUnit;
 uniform float opacity;
 uniform float translate;
@@ -60,6 +62,8 @@ void main(void)
         result += glowFragment();
     }
 
-    fragColor = result;
-    fragColor *= colorMatrix;
+    //result *=
+
+    fragColor = adjustBrightness(result);
+    //fragColor *= colorMatrix;
 }

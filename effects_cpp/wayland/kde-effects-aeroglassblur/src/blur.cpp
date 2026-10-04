@@ -108,7 +108,7 @@ BlurEffect::BlurEffect()
         m_downsamplePass.halfpixelLocation = m_downsamplePass.shader->uniformLocation("halfpixel");
     }
 
-    m_upsamplePass.shader = ShaderManager::instance()->generateShaderFromFile(ShaderTrait::MapTexture,
+    m_upsamplePass.shader = ShaderManager::instance()->generateShaderFromFile(ShaderTrait::MapTexture | ShaderTrait::AdjustSaturation | ShaderTrait::TransformColorspace,
                                                                               QStringLiteral(":/effects/aeroblur/shaders/vertex.vert"),
                                                                               QStringLiteral(":/effects/aeroblur/shaders/upsample.frag"));
     if (!m_upsamplePass.shader) {
@@ -118,11 +118,12 @@ BlurEffect::BlurEffect()
         m_upsamplePass.mvpMatrixLocation = m_upsamplePass.shader->uniformLocation("modelViewProjectionMatrix");
         m_upsamplePass.offsetLocation = m_upsamplePass.shader->uniformLocation("offset");
         m_upsamplePass.halfpixelLocation = m_upsamplePass.shader->uniformLocation("halfpixel");
+        m_upsamplePass.applyInverseColorTransformLocation = m_upsamplePass.shader->uniformLocation("applyInverseColorTransform");
     }
 
     for(int i = 0; i < 3; i++) {
         qCWarning(KWIN_BLUR) << "Loading shader " << aeroShaderLocations[i];
-        m_aeroPasses[i].shader = ShaderManager::instance()->generateShaderFromFile(ShaderTrait::MapTexture,
+        m_aeroPasses[i].shader = ShaderManager::instance()->generateShaderFromFile(ShaderTrait::MapTexture | ShaderTrait::AdjustSaturation | ShaderTrait::TransformColorspace,
                                                                                    QStringLiteral(":/effects/aeroblur/shaders/vertex.vert"),
                                                                                    aeroShaderLocations[i]);
         if (!m_aeroPasses[i].shader) {
@@ -145,7 +146,7 @@ BlurEffect::BlurEffect()
 
     }
 
-    m_reflectPass.shader = ShaderManager::instance()->generateShaderFromFile(ShaderTrait::MapTexture,
+    m_reflectPass.shader = ShaderManager::instance()->generateShaderFromFile(ShaderTrait::MapTexture | ShaderTrait::AdjustSaturation | ShaderTrait::TransformColorspace,
                                                                              QStringLiteral(":/effects/aeroblur/shaders/vertex.vert"),
                                                                              QStringLiteral(":/effects/aeroblur/shaders/reflect.frag"));
 
@@ -1079,6 +1080,13 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
                                       0.5 / (double)read->colorAttachment()->height());
             m_upsamplePass.shader->setUniform(m_upsamplePass.halfpixelLocation, halfpixel);
 
+            const auto toXYZ = renderTarget.colorDescription()->containerColorimetry().toXYZ();
+            m_upsamplePass.shader->setUniform(GLShader::FloatUniform::Saturation, data.saturation());
+            m_upsamplePass.shader->setUniform(GLShader::Vec3Uniform::PrimaryBrightness, QVector3D(toXYZ(1, 0), toXYZ(1, 1), toXYZ(1, 2)));
+            // At the last upsample pass, We need to reverse the brightness and colorspace trnsformation performed by the base shader in order to prevent unintended darkening of the overall blur
+            m_upsamplePass.shader->setColorspaceUniforms(renderTarget.colorDescription(), ColorDescription::sRGB, RenderingIntent::AbsoluteColorimetricNoAdaptation);
+            m_upsamplePass.shader->setUniform(m_upsamplePass.applyInverseColorTransformLocation, i == 2);
+
             read->colorAttachment()->bind();
 
             vbo->draw(GL_TRIANGLES, 0, 6);
@@ -1086,6 +1094,8 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
 
         ShaderManager::instance()->popShader();
     }
+
+
 
     const float modulation = opacity * opacity;
     const QMatrix4x4 colorMatrix = colorTransformMatrix(data.saturation() * hdr_brightness_correction, data.brightness());
@@ -1150,6 +1160,11 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
         const auto &read = renderInfo.framebuffers[1];
 
 
+        const auto toXYZ = renderTarget.colorDescription()->containerColorimetry().toXYZ();
+        m_aeroPasses[selectedPass].shader->setUniform(GLShader::FloatUniform::Saturation, data.saturation());
+        m_aeroPasses[selectedPass].shader->setUniform(GLShader::Vec3Uniform::PrimaryBrightness, QVector3D(toXYZ(1, 0), toXYZ(1, 1), toXYZ(1, 2)));
+        m_aeroPasses[selectedPass].shader->setColorspaceUniforms(ColorDescription::sRGB, renderTarget.colorDescription(), RenderingIntent::Perceptual);
+
         const QVector2D halfpixel(0.5 / (double)read->colorAttachment()->width(),
                                   0.5 / (double)read->colorAttachment()->height());
         m_aeroPasses[selectedPass].shader->setUniform(m_aeroPasses[selectedPass].mvpMatrixLocation, projectionMatrix);
@@ -1186,6 +1201,8 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
 
     // Reflection and corner shines
     {
+
+
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -1208,6 +1225,11 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
             QMatrix4x4 projectionMatrix = viewport.projectionMatrix();
             projectionMatrix.translate(scaledBackgroundRect.x(), scaledBackgroundRect.y());
             const auto scale = viewport.scale();
+
+            const auto toXYZ = renderTarget.colorDescription()->containerColorimetry().toXYZ();
+            m_reflectPass.shader->setUniform(GLShader::FloatUniform::Saturation, data.saturation());
+            m_reflectPass.shader->setUniform(GLShader::Vec3Uniform::PrimaryBrightness, QVector3D(toXYZ(1, 0), toXYZ(1, 1), toXYZ(1, 2)));
+            m_reflectPass.shader->setColorspaceUniforms(ColorDescription::sRGB, renderTarget.colorDescription(), RenderingIntent::Perceptual);
 
             m_reflectPass.shader->setUniform(m_reflectPass.mvpMatrixLocation, projectionMatrix);
             m_reflectPass.shader->setUniform(m_reflectPass.screenResolutionLocation, QVector2D(screenSize.width() * scale, screenSize.height() * scale));

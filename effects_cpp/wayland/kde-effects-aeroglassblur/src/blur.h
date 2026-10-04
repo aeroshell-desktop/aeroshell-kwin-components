@@ -145,6 +145,7 @@ private:
         int colorMatrixLocation;
         int offsetLocation;
         int halfpixelLocation;
+        int applyInverseColorTransformLocation;
 
     } m_upsamplePass;
 
