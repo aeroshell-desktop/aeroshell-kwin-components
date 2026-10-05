@@ -163,6 +163,7 @@ BlurEffect::BlurEffect()
         m_reflectPass.translateTextureLocation = m_reflectPass.shader->uniformLocation("translate");
         m_reflectPass.colorMatrixLocation = m_reflectPass.shader->uniformLocation("colorMatrix");
         m_reflectPass.reflectTextureLocation = m_reflectPass.shader->uniformLocation("texUnit");
+        m_reflectPass.viewportLocation = m_reflectPass.shader->uniformLocation("viewport");
         // Glow
         m_reflectPass.textureSizeLocation = m_reflectPass.shader->uniformLocation("textureSize");
         m_reflectPass.useWaylandLocation = m_reflectPass.shader->uniformLocation("useWayland");
@@ -1239,6 +1240,8 @@ void BlurEffect::blur(const RenderTarget &renderTarget, const RenderViewport &vi
             m_reflectPass.shader->setUniform(m_reflectPass.opacityLocation, float(finalOpacity));
             m_reflectPass.shader->setUniform(m_reflectPass.translateTextureLocation, m_translateTexture ? float(1.0) : float(0.0));
             m_reflectPass.shader->setUniform(m_reflectPass.colorMatrixLocation, colorMatrix);
+            QVector4D vport(viewport.scaledRenderRect().x(), viewport.scaledRenderRect().y(), viewport.scaledRenderRect().width(), viewport.scaledRenderRect().height());
+            m_reflectPass.shader->setUniform(m_reflectPass.viewportLocation, vport);
 
             bool useWayland = effects->waylandDisplay() != nullptr; // Determine whether to flip the textures or not
             auto renderTexture = renderTarget.texture();

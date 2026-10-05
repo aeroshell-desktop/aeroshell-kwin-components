@@ -121,6 +121,7 @@ private:
         int opacityLocation;
         int translateTextureLocation;
         int reflectTextureLocation;
+        int viewportLocation;
 
         // Glow
         int glowTextureLocation;

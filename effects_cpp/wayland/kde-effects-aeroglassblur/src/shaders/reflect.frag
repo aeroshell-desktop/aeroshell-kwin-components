@@ -9,6 +9,7 @@ uniform vec2 screenResolution;
 uniform vec2 windowSize;
 uniform mat4 colorMatrix;
 uniform vec2 windowPos;
+uniform vec4 viewport;
 
 // Glow
 uniform bool useWayland;
@@ -47,8 +48,8 @@ void main(void)
     float middleScreenLine = screenResolution.x / 2.0;
     float dx = translate * (middleScreenLine - middleLine) / 10.0;
 
-    float x = (gl_FragCoord.x + dx) / screenResolution.x;
-    float y = (gl_FragCoord.y) / screenResolution.y;
+    float x = ((gl_FragCoord.x + viewport.x) + dx) / screenResolution.x;
+    float y = (gl_FragCoord.y + viewport.y) / screenResolution.y;
 
     vec2 uv;
     if(useWayland) {
@@ -62,8 +63,5 @@ void main(void)
         result += glowFragment();
     }
 
-    //result *=
-
     fragColor = adjustBrightness(result);
-    //fragColor *= colorMatrix;
 }
