@@ -15,4 +15,8 @@
   <file>frame.svg</file>
   <file>frame-select.svg</file>
 </qresource>
+<qresource prefix="/">
+  <file alias="opengl/aeroshell/outputmanagement.frag">../../glsl/outputmanagement.frag</file>
+  <file alias="opengl/aeroshell/brightnessadjust.frag">shaders/aero/brightnessadjust.frag</file>
+</qresource>
 </RCC>

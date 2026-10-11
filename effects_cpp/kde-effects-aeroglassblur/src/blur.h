@@ -121,6 +121,7 @@ private:
         int opacityLocation;
         int translateTextureLocation;
         int reflectTextureLocation;
+        int viewportLocation;
 
         // Glow
         int glowTextureLocation;
@@ -145,6 +146,7 @@ private:
         int colorMatrixLocation;
         int offsetLocation;
         int halfpixelLocation;
+        int applyInverseColorTransformLocation;
 
     } m_upsamplePass;
 

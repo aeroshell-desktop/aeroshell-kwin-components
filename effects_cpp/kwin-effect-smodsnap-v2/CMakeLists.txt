@@ -1,7 +1,6 @@
 set(kwin4_effect_smodsnap_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/smodsnap-kf6.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/smodsnap.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/smodsnap.qrc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/plugin.cpp
 )
 
