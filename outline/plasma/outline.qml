@@ -8,7 +8,7 @@
 
 import QtCore
 import QtQuick
-import QtQuick.Window
+import QtQuick.Window as QuickWindow
 import org.kde.kwin
 import org.kde.ksvg as KSvg
 import org.kde.kirigami as Kirigami
@@ -28,7 +28,7 @@ import QtQuick.Controls
  * outline.unifiedGeometry is the union of outline.geometry and outline.visualParentGeometry.
  */
 
-Window
+QuickWindow.Window
 {
     id: window
 
